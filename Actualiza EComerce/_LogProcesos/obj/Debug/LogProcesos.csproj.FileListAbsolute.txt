@@ -1,8 +1,0 @@
-D:\Actualiza EComerce\LogProcesos\bin\Debug\LogProcesos.dll.config
-D:\Actualiza EComerce\LogProcesos\bin\Debug\LogProcesos.dll
-D:\Actualiza EComerce\LogProcesos\bin\Debug\LogProcesos.pdb
-D:\Actualiza EComerce\LogProcesos\bin\Debug\MySql.Data.dll
-D:\Actualiza EComerce\LogProcesos\bin\Debug\MySql.Data.xml
-D:\Actualiza EComerce\LogProcesos\obj\Debug\LogProcesos.dll
-D:\Actualiza EComerce\LogProcesos\obj\Debug\LogProcesos.pdb
-D:\Actualiza EComerce\LogProcesos\obj\Debug\LogProcesos.csprojResolveAssemblyReference.cache
