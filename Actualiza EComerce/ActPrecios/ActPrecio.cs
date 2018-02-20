@@ -64,7 +64,7 @@ namespace ActPrecios
                 string archivo = DateTime.Today.ToString("yyyy.MM.dd")+ " Log Error Precios - ";
                 //crea directorio si no existe
                 if (!Directory.Exists(path+"\\"+nombre))
-                {
+                {   //Crea el directorio
                     DirectoryInfo di = Directory.CreateDirectory(path + "\\" + nombre);
                 }
                 //correlativo de archivo de ejecución en el día
@@ -110,7 +110,6 @@ namespace ActPrecios
                             val = "si";
                             Final.ImportRow(row1);
                             Productos.Rows.Remove(row2);
-                            //descuentos.Rows.Remove(row1);
                             break;
                         }
                     }
@@ -151,6 +150,7 @@ namespace ActPrecios
 
                     try
                     {
+                        //ejecucion
                         comm.ExecuteNonQuery();
                         com2.ExecuteNonQuery();
                     }

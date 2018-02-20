@@ -138,6 +138,7 @@ namespace ActDescuentos
 
                     try
                     {
+                        //ejecucion
                         comm.ExecuteNonQuery();
                     }
                     catch(Exception ex)

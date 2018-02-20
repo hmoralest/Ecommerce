@@ -83,7 +83,7 @@ namespace ActStocks
                 string archivo = DateTime.Today.ToString("yyyy.MM.dd")+ " Log Error Stocks - ";
                 //crea directorio si no existe
                 if (!Directory.Exists(path+"\\"+nombre))
-                {
+                {   //Crea el directorio
                     DirectoryInfo di = Directory.CreateDirectory(path + "\\" + nombre);
                 }
                 //correlativo de archivo de ejecución en el día
@@ -166,8 +166,9 @@ namespace ActStocks
                     
                     try
                     {
+                        //ejecucion
                         comm.ExecuteNonQuery();
-                        //Actualizar Movimiento para no repetirlo
+                        //Actualizar Movimiento para no repetir
                         ActualizaOrigen("11", row["mov_id"].ToString(), row["det_mov_id"].ToString());
                     }
                     catch(Exception ex)
