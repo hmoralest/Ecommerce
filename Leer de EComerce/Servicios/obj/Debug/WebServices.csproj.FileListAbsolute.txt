@@ -1,0 +1,32 @@
+C:\Users\JSolis\Desktop\Jorge Solis Mc Lellan\Proyectos\BataCommerce\Servicios\obj\Debug\WebServices.csprojResolveAssemblyReference.cache
+C:\Users\JSolis\Desktop\Jorge Solis Mc Lellan\Proyectos\BataCommerce\Servicios\bin\Debug\Servicios.dll
+C:\Users\JSolis\Desktop\Jorge Solis Mc Lellan\Proyectos\BataCommerce\Servicios\bin\Debug\Servicios.pdb
+C:\Users\JSolis\Desktop\Jorge Solis Mc Lellan\Proyectos\BataCommerce\Servicios\bin\Debug\Bukimedia.PrestaSharp.dll
+C:\Users\JSolis\Desktop\Jorge Solis Mc Lellan\Proyectos\BataCommerce\Servicios\bin\Debug\Datos.dll
+C:\Users\JSolis\Desktop\Jorge Solis Mc Lellan\Proyectos\BataCommerce\Servicios\bin\Debug\Entidad.dll
+C:\Users\JSolis\Desktop\Jorge Solis Mc Lellan\Proyectos\BataCommerce\Servicios\bin\Debug\RestSharp.dll
+C:\Users\JSolis\Desktop\Jorge Solis Mc Lellan\Proyectos\BataCommerce\Servicios\bin\Debug\Datos.pdb
+C:\Users\JSolis\Desktop\Jorge Solis Mc Lellan\Proyectos\BataCommerce\Servicios\bin\Debug\Entidad.pdb
+C:\Users\JSolis\Desktop\Jorge Solis Mc Lellan\Proyectos\BataCommerce\Servicios\bin\Debug\RestSharp.xml
+C:\Users\JSolis\Desktop\Jorge Solis Mc Lellan\Proyectos\BataCommerce\Servicios\obj\Debug\Servicios.dll
+C:\Users\JSolis\Desktop\Jorge Solis Mc Lellan\Proyectos\BataCommerce\Servicios\obj\Debug\Servicios.pdb
+D:\Desarrollos Visual\BataCommerce\Servicios\bin\Debug\Servicios.dll
+D:\Desarrollos Visual\BataCommerce\Servicios\bin\Debug\Servicios.pdb
+D:\Desarrollos Visual\BataCommerce\Servicios\bin\Debug\Bukimedia.PrestaSharp.dll
+D:\Desarrollos Visual\BataCommerce\Servicios\bin\Debug\Datos.dll
+D:\Desarrollos Visual\BataCommerce\Servicios\bin\Debug\Entidad.dll
+D:\Desarrollos Visual\BataCommerce\Servicios\bin\Debug\RestSharp.dll
+D:\Desarrollos Visual\BataCommerce\Servicios\bin\Debug\Datos.pdb
+D:\Desarrollos Visual\BataCommerce\Servicios\bin\Debug\Entidad.pdb
+D:\Desarrollos Visual\BataCommerce\Servicios\bin\Debug\RestSharp.xml
+D:\Desarrollos Visual\BataCommerce\Servicios\obj\Debug\WebServices.csprojResolveAssemblyReference.cache
+D:\Desarrollos Visual\BataCommerce\Servicios\obj\Debug\Servicios.dll
+D:\Desarrollos Visual\BataCommerce\Servicios\obj\Debug\Servicios.pdb
+D:\ECommerce\Leer de EComerce\Servicios\obj\Debug\WebServices.csprojResolveAssemblyReference.cache
+D:\ECommerce\Leer de EComerce\Servicios\obj\Debug\Servicios.dll
+D:\ECommerce\Leer de EComerce\Servicios\obj\Debug\Servicios.pdb
+D:\ECommerce\Leer de EComerce\Servicios\bin\Debug\Servicios.dll
+D:\ECommerce\Leer de EComerce\Servicios\bin\Debug\Servicios.pdb
+D:\ECommerce\Leer de EComerce\Servicios\bin\Debug\Bukimedia.PrestaSharp.dll
+D:\ECommerce\Leer de EComerce\Servicios\bin\Debug\RestSharp.dll
+D:\ECommerce\Leer de EComerce\Servicios\bin\Debug\RestSharp.xml
