@@ -1,0 +1,11 @@
+c:\users\henry morales\documents\visual studio 2015\Projects\ConsoleApplication1\ConsoleApplication1\bin\Debug\ActPrecios.exe.config
+c:\users\henry morales\documents\visual studio 2015\Projects\ConsoleApplication1\ConsoleApplication1\obj\Debug\ActPrecios.csprojResolveAssemblyReference.cache
+c:\users\henry morales\documents\visual studio 2015\Projects\ConsoleApplication1\ConsoleApplication1\bin\Debug\ActPrecios.exe
+c:\users\henry morales\documents\visual studio 2015\Projects\ConsoleApplication1\ConsoleApplication1\bin\Debug\ActPrecios.pdb
+c:\users\henry morales\documents\visual studio 2015\Projects\ConsoleApplication1\ConsoleApplication1\bin\Debug\MySql.Data.dll
+c:\users\henry morales\documents\visual studio 2015\Projects\ConsoleApplication1\ConsoleApplication1\bin\Debug\MySql.Data.xml
+c:\users\henry morales\documents\visual studio 2015\Projects\ConsoleApplication1\ConsoleApplication1\obj\Debug\ActPrecios.exe
+c:\users\henry morales\documents\visual studio 2015\Projects\ConsoleApplication1\ConsoleApplication1\obj\Debug\ActPrecios.pdb
+D:\Actualiza EComerce\ActPrecios\bin\Debug\ActPrecios.exe.config
+D:\Actualiza EComerce\ActPrecios\obj\Debug\ActPrecios.exe
+D:\Actualiza EComerce\ActPrecios\obj\Debug\ActPrecios.pdb

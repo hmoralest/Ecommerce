@@ -1,0 +1,10 @@
+D:\ECommerce\Actualiza EComerce\ActStocks\bin\Debug\ActStocks.exe.config
+D:\ECommerce\Actualiza EComerce\ActStocks\bin\Debug\ActStocks.exe
+D:\ECommerce\Actualiza EComerce\ActStocks\bin\Debug\ActStocks.pdb
+D:\ECommerce\Actualiza EComerce\ActStocks\bin\Debug\LogProcesos.dll
+D:\ECommerce\Actualiza EComerce\ActStocks\bin\Debug\MySql.Data.dll
+D:\ECommerce\Actualiza EComerce\ActStocks\bin\Debug\LogProcesos.pdb
+D:\ECommerce\Actualiza EComerce\ActStocks\bin\Debug\MySql.Data.xml
+D:\ECommerce\Actualiza EComerce\ActStocks\obj\Debug\ActStocks.csprojResolveAssemblyReference.cache
+D:\ECommerce\Actualiza EComerce\ActStocks\obj\Debug\ActStocks.exe
+D:\ECommerce\Actualiza EComerce\ActStocks\obj\Debug\ActStocks.pdb

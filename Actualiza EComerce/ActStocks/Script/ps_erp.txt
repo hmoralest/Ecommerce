@@ -1,0 +1,5 @@
+DROP TABLE IF EXISTS `batadb`.`ps_erp`;
+CREATE TABLE  `batadb`.`ps_erp` (
+  `ref_product` varchar(32) NOT NULL,
+  `stock` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

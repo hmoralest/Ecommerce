@@ -1,0 +1,21 @@
+DELIMITER //
+
+CREATE TRIGGER stock_insert
+AFTER INSERT
+   ON ps_erp FOR EACH ROW
+
+BEGIN
+
+		Update ps_product_attribute  pa
+			Inner Join ps_stock_available sa
+				On sa.id_product = pa.id_product And sa.id_product_attribute = pa.id_product_attribute
+			Inner Join ps_stock_available sa2
+				On sa2.id_product = pa.id_product And sa2.id_product_attribute = 0
+		Set 	sa2.quantity = sa2.quantity + NEW.stock,
+			sa.quantity = sa.quantity + NEW.stock
+		Where pa.reference = NEW.ref_product;
+/*		Where pa.reference = Concat(Substring(NEW.ref_product,1,3),'-',Substring(NEW.ref_product,4,30));*/
+
+END; //
+
+DELIMITER ;
