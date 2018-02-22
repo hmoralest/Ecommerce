@@ -8,9 +8,9 @@ using Servicios.Ecommerce;
 using Bukimedia.PrestaSharp.Entities;
 using System.Data;
 
-namespace LeerPedido
+namespace LeerPedidos
 {
-    class LeerPedidos
+    class LeerPedido
     {
         EcommerceBL oEcommerce = new EcommerceBL();
 
@@ -289,11 +289,11 @@ namespace LeerPedido
 
         }
 
-        public static void Main(string[] args)
+        /*public static void Main(string[] args)
         {
-            LeerPedidos ped = new LeerPedidos();
+            LeerPedido ped = new LeerPedido();
             DataTable imprimir = ped.PrepararPedidos();
             Console.ReadKey();
-        }
+        }*/
     }
 }

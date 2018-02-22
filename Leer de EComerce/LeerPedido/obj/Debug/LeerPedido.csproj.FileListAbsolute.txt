@@ -9,3 +9,5 @@ D:\ECommerce\Leer de EComerce\LeerPedido\bin\Debug\Servicios.pdb
 D:\ECommerce\Leer de EComerce\LeerPedido\bin\Debug\RestSharp.xml
 D:\ECommerce\Leer de EComerce\LeerPedido\obj\Debug\LeerPedido.exe
 D:\ECommerce\Leer de EComerce\LeerPedido\obj\Debug\LeerPedido.pdb
+D:\ECommerce\Leer de EComerce\LeerPedido\bin\Debug\MySql.Data.dll
+D:\ECommerce\Leer de EComerce\LeerPedido\bin\Debug\MySql.Data.xml

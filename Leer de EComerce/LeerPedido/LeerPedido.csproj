@@ -36,7 +36,9 @@
     <Reference Include="Bukimedia.PrestaSharp">
       <HintPath>..\Servicios\bin\Debug\Bukimedia.PrestaSharp.dll</HintPath>
     </Reference>
+    <Reference Include="MySql.Data, Version=6.9.11.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL" />
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -46,6 +48,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Conexion.cs" />
+    <Compile Include="TraerPedidos.cs" />
     <Compile Include="LeerPedidos.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
