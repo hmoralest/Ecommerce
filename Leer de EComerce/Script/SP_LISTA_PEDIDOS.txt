@@ -1,39 +1,41 @@
+DROP Procedure IF EXISTS USP_LISTA_PEDIDOS;
+
 DELIMITER //
 
-CREATE procedure USP_LISTA_PEDIDOS (estado int)
+CREATE Procedure USP_LISTA_PEDIDOS (estado int)
 BEGIN
 
-	Select	ped.id_order			as ped_id,
-		ped.reference			as ped_ref,
-		ped.date_add			as ped_fecha,
-		dir_ped.id_state		as ped_ubigeo_ent,
-		dir_ped.address1		as ped_dir_ent,
-		ped.total_paid_tax_excl		as ped_total_sigv,
-		ped.total_paid			as ped_total_cigv,
-		ped.total_discounts_tax_excl	as ped_dcto_sigv,
-		ped.total_discounts		as ped_dcto_cigv,
-		ped.total_shipping_tax_excl	as ped_ship_sigv,
-		ped.total_shipping		as ped_ship_cigv,
-		ped.id_customer			as cli_id,
-		cli.firstname			as cli_nombres,
-		cli.lastname			as cli_apellidos,
-		cli.birthday			as cli_fec_nac,
-		cli.email			as cli_email,
-		dir_cli.id_state		as cli_ubigeo,
-		dir_cli.address1		as cli_direc,
-		dir_cli.phone			as cli_telf,
-		dir_cli.dni			as cli_dni,
-		det_ped.product_id		as det_artic,
-		det_ped.product_reference	as det_artic_ref,
-		det_ped.product_name		as det_desc_artic,
-		det_ped.product_quantity	as det_cant,
-		det_ped.product_price		as det_prec_sigv,
-		det_ped.unit_price_tax_excl	as det_dcto_sigv,
-		pag.payment_method		as pag_metodo,
-		pag.transaction_id		as pag_nro_trans,
-		pag.card_number			as pag_nro_tarj,
-		pag.date_add			as pag_fecha,
-		pag.amount			as pag_monto
+	Select	Cast(ped.id_order as char)		as ped_id,
+		Cast(ped.reference as char)		as ped_ref,
+		Cast(ped.date_add as char)		as ped_fecha,
+		dir_ped.id_state			as ped_ubigeo_ent,
+		dir_ped.address1			as ped_dir_ent,
+		ped.total_paid_tax_excl			as ped_total_sigv,
+		ped.total_paid				as ped_total_cigv,
+		ped.total_discounts_tax_excl		as ped_dcto_sigv,
+		ped.total_discounts			as ped_dcto_cigv,
+		ped.total_shipping_tax_excl		as ped_ship_sigv,
+		ped.total_shipping			as ped_ship_cigv,
+		ped.id_customer				as cli_id,
+		cli.firstname				as cli_nombres,
+		cli.lastname				as cli_apellidos,
+		cli.birthday				as cli_fec_nac,
+		cli.email				as cli_email,
+		dir_cli.id_state			as cli_ubigeo,
+		dir_cli.address1			as cli_direc,
+		dir_cli.phone				as cli_telf,
+		dir_cli.dni				as cli_dni,
+		det_ped.product_id			as det_artic,
+		det_ped.product_reference		as det_artic_ref,
+		det_ped.product_name			as det_desc_artic,
+		det_ped.product_quantity		as det_cant,
+		det_ped.product_price			as det_prec_sigv,
+		det_ped.reduction_amount_tax_excl	as det_dcto_sigv,
+		pag.payment_method			as pag_metodo,
+		pag.transaction_id			as pag_nro_trans,
+		pag.card_number				as pag_nro_tarj,
+		pag.date_add				as pag_fecha,
+		pag.amount				as pag_monto
 	From ps_orders ped
 		Inner Join ps_address dir_ped
 			On ped.id_address_delivery = dir_ped.id_address

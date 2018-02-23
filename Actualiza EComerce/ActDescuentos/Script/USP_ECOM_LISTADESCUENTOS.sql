@@ -17,7 +17,7 @@ ALTER Procedure USP_ECOM_LISTADESCUENTOS(
 AS 
 BEGIN
 
-	Select	Cast(codart As Int)								As product_id,
+	Select	codart											As product_id,
 			Replace(convert(varchar,fecini,102),'.','')		As Fecha_Ini,
 			Replace(convert(varchar,fecfin,102),'.','')		As Fecha_Fin,
 			montodcto										As Monto
@@ -30,4 +30,3 @@ BEGIN
 	  /*Select Distinct 'ecom',Cast(codigo As Int) As product_id,'20180201' As Fecha_Ini, '20180228' As Fecha_Fin, 20 As Monto
 	  From [BD_BataCommerce_Test].dbo.producto;*/
 END
-

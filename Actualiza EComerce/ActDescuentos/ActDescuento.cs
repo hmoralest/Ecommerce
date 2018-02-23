@@ -74,7 +74,7 @@ namespace ActDescuentos
                 StreamWriter sw = new StreamWriter(path + "\\" + nombre + "\\" + archivo + contador.ToString() + ".txt");
 
                 //Valida con Productos Existentes
-                string queryvalida = "Select Distinct id_product  From ps_product";
+                string queryvalida = "Select Distinct replace(reference,'-','') as id_product  From ps_product;";
                 MySqlCommand cmd = new MySqlCommand(queryvalida, mysql);
                 MySqlDataAdapter returnVal = new MySqlDataAdapter(queryvalida, mysql);
                 DataTable Productos = new DataTable();
@@ -131,11 +131,14 @@ namespace ActDescuentos
                 //recorro datatable final
                 foreach (DataRow row in Final.Rows)
                 {
+                    string cadena;
                     cant_reg = cant_reg + 1;
                     //Actualizar en Prestashop
                     MySqlCommand comm = mysql.CreateCommand();
-                    comm.CommandText = "Insert into ps_specific_price values ("+cant_reg.ToString()+",0,0,"+ row["product_id"] + ",1,0,0,0,0,0,0,-1,1,"+ row["Monto"] + ",1,'amount','"+ row["Fecha_Ini"] + "','" + row["Fecha_Fin"] + "');";
-
+                    cadena =            "Insert into ps_specific_price ";
+                    cadena = cadena +   "Select " + cant_reg.ToString() + ",0,0,id_product,1,0,0,0,0,0,0,-1,1," + row["Monto"] + ",1,'amount','" + row["Fecha_Ini"] + "','" + row["Fecha_Fin"] + "' ";
+                    cadena = cadena +   "From ps_product Where replace(reference,'-', '') = '" + row["product_id"] + "'";
+                    comm.CommandText = cadena;
                     try
                     {
                         //ejecucion

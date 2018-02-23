@@ -19,7 +19,7 @@ ALTER Procedure USP_ECOM_LISTAPRECIOS(
 AS 
 BEGIN
 
-	Select	Cast(b.cod_artic As Int)				As product_id,
+	Select	b.cod_artic							As product_id,
 			Cast(b.val_pvent1 As Decimal(20,6))	As precio1,
 			Cast(b.val_pvent2 As Decimal(20,6))	As precio2,
 			b.fec_vigen

@@ -76,7 +76,7 @@ namespace ActPrecios
                 StreamWriter sw = new StreamWriter(path + "\\" + nombre + "\\" + archivo + contador.ToString() + ".txt");
 
                 //Valida con Productos Existentes
-                string queryvalida = "Select Distinct id_product  From ps_product";
+                string queryvalida = "Select Distinct replace(reference,'-','') as id_product  From ps_product;";
                 MySqlCommand cmd = new MySqlCommand(queryvalida, mysql);
                 MySqlDataAdapter returnVal = new MySqlDataAdapter(queryvalida, mysql);
                 DataTable Productos = new DataTable();
@@ -145,8 +145,8 @@ namespace ActPrecios
                     double precio = Math.Round((Convert.ToDouble(row["precio1"]) / 1.18), 1);
                     MySqlCommand comm = mysql.CreateCommand();
                     MySqlCommand com2 = mysql.CreateCommand();
-                    comm.CommandText = "Update ps_product p set p.price = " + precio.ToString() + " where p.id_product = " + row["product_id"] + ";";
-                    com2.CommandText = "Update ps_product_shop p set p.price = "+ precio.ToString() + " where p.id_product = "+ row["product_id"] + ";";
+                    comm.CommandText = "Update ps_product p set p.price = " + precio.ToString() + " where replace(p.reference,'-','') = '" + row["product_id"] + "';";
+                    com2.CommandText = "Update ps_product_shop ps Inner Join ps_product p On ps.id_product = p.id_product Set ps.price = " + precio.ToString() + " Where replace(p.reference, '-', '') = '" + row["product_id"] + "'; ";
 
                     try
                     {

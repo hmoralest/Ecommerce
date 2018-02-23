@@ -1,4 +1,12 @@
-
 Actualiza EComerce/ActStocks/bin/Debug/*
-Actualiza EComerce/ActDescuentos/bin/Debug/*
+Actualiza EComerce/ActStocks/obj/Debug/*
 Actualiza EComerce/ActPrecios/bin/Debug/*
+Actualiza EComerce/ActPrecios/obj/Debug/*
+Actualiza EComerce/ActDescuentos/bin/Debug/*
+Actualiza EComerce/ActDescuentos/obj/Debug/*
+Actualiza EComerce/LogProcesos/bin/Debug/*
+Actualiza EComerce/LogProcesos/obj/Debug/*
+Leer de EComerce/LeerPedido/bin/Debug/*
+Leer de EComerce/LeerPedido/obj/Debug/*
+PrestasharpChristian/PrestasharpChristian/bin/Debug/*
+PrestasharpChristian/PrestasharpChristian/obj/Debug/*
