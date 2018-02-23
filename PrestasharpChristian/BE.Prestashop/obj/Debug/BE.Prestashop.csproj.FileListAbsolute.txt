@@ -1,8 +1,0 @@
-c:\users\jsolis\documents\visual studio 2015\Projects\PrestasharpChristian\BE.Prestashop\bin\Debug\BE.Prestashop.dll
-c:\users\jsolis\documents\visual studio 2015\Projects\PrestasharpChristian\BE.Prestashop\bin\Debug\BE.Prestashop.pdb
-c:\users\jsolis\documents\visual studio 2015\Projects\PrestasharpChristian\BE.Prestashop\bin\Debug\Bukimedia.PrestaSharp.dll
-c:\users\jsolis\documents\visual studio 2015\Projects\PrestasharpChristian\BE.Prestashop\bin\Debug\RestSharp.dll
-c:\users\jsolis\documents\visual studio 2015\Projects\PrestasharpChristian\BE.Prestashop\bin\Debug\RestSharp.xml
-c:\users\jsolis\documents\visual studio 2015\Projects\PrestasharpChristian\BE.Prestashop\obj\Debug\BE.Prestashop.csprojResolveAssemblyReference.cache
-c:\users\jsolis\documents\visual studio 2015\Projects\PrestasharpChristian\BE.Prestashop\obj\Debug\BE.Prestashop.dll
-c:\users\jsolis\documents\visual studio 2015\Projects\PrestasharpChristian\BE.Prestashop\obj\Debug\BE.Prestashop.pdb

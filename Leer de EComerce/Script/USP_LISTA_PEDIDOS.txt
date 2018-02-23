@@ -1,0 +1,54 @@
+DROP Procedure IF EXISTS USP_LISTA_PEDIDOS;
+
+DELIMITER //
+
+CREATE Procedure USP_LISTA_PEDIDOS (estado int)
+BEGIN
+
+	Select	Cast(ped.id_order as char)		as ped_id,
+		Cast(ped.reference as char)		as ped_ref,
+		Cast(ped.date_add as char)				as ped_fecha,
+		Cast(dir_ped.id_state as char)			as ped_ubigeo_ent,
+		Cast(dir_ped.address1 as char)			as ped_dir_ent,
+		ped.total_paid_tax_excl			as ped_total_sigv,
+		ped.total_paid				as ped_total_cigv,
+		ped.total_discounts_tax_excl		as ped_dcto_sigv,
+		ped.total_discounts			as ped_dcto_cigv,
+		ped.total_shipping_tax_excl		as ped_ship_sigv,
+		ped.total_shipping			as ped_ship_cigv,
+		Cast(ped.id_customer as char)				as cli_id,
+		Cast(cli.firstname as char)				as cli_nombres,
+		Cast(cli.lastname as char)				as cli_apellidos,
+		Cast(cli.birthday as char)				as cli_fec_nac,
+		Cast(cli.email as char)				as cli_email,
+		Cast(dir_cli.id_state as char)			as cli_ubigeo,
+		Cast(dir_cli.address1 as char)			as cli_direc,
+		Cast(dir_cli.phone as char)				as cli_telf,
+		Cast(dir_cli.dni as char)				as cli_dni,
+		Cast(det_ped.product_id as char)			as det_artic,
+		Cast(det_ped.product_reference as char)		as det_artic_ref,
+		Cast(det_ped.product_name as char)			as det_desc_artic,
+		det_ped.product_quantity		as det_cant,
+		det_ped.product_price			as det_prec_sigv,
+		det_ped.reduction_amount/1.18		as det_dcto_sigv,
+		Cast(pag.payment_method as char)			as pag_metodo,
+		Cast(pag.transaction_id as char)			as pag_nro_trans,
+		Cast(pag.card_number as char)				as pag_nro_tarj,
+		Cast(pag.date_add as char)				as pag_fecha,
+		pag.amount				as pag_monto
+	From ps_orders ped
+		Inner Join ps_address dir_ped
+			On ped.id_address_delivery = dir_ped.id_address
+		Inner Join ps_customer cli
+			On ped.id_customer = cli.id_customer
+		Inner Join ps_address dir_cli
+			On ped.id_address_invoice= dir_cli.id_address
+		Inner Join ps_order_detail det_ped
+			On ped.id_order = det_ped.id_order
+		Inner Join ps_order_payment pag
+			On ped.reference = pag.order_reference
+	Where ped.current_state = estado;
+
+END//
+
+DELIMITER ;
