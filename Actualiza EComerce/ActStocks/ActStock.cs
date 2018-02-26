@@ -23,6 +23,9 @@ namespace ActStocks
         LogProceso log = new LogProceso();
 
         string proceso = "ActStocks";
+        string archivo = "";
+        string tienda = "11";
+        public static StreamWriter sw;
 
         public DataTable ListaStocks(string tienda)
         {
@@ -66,6 +69,21 @@ namespace ActStocks
                 throw ex;
             }
         }
+        public void CrearArchivoLog()
+        {
+            //datos para archivo LOG
+            string path = Environment.CurrentDirectory;
+            string nombre = "Log Errores";
+            string nom_archiv = DateTime.Today.ToString("yyyy.MM.dd") + " Log Actualiza Stocks";
+            //crea directorio si no existe
+            if (!Directory.Exists(path + "\\" + nombre))
+            {   //Crea el directorio
+                DirectoryInfo di = Directory.CreateDirectory(path + "\\" + nombre);
+            }
+            //Crea el Writer
+            sw = File.AppendText(path + "\\" + nombre + "\\" + nom_archiv + ".txt");
+            archivo = path + "\\" + nombre + "\\" + nom_archiv + ".txt";
+        }
 
         public void ActualizaStocks(DataTable precios)
         {
@@ -76,7 +94,7 @@ namespace ActStocks
                 //Actualiza estado a proceso abierto
                 log.ActualizaLogProceso(proceso, -1);
 
-                //datos para archivo LOG
+                /*//datos para archivo LOG
                 int contador = 1;
                 string path = Environment.CurrentDirectory;
                 string nombre = "Log Errores";
@@ -92,7 +110,7 @@ namespace ActStocks
                     contador = contador + 1;
                 }
                 //Crea el Writer
-                StreamWriter sw = new StreamWriter(path + "\\" + nombre + "\\" + archivo + contador.ToString() + ".txt");
+                StreamWriter sw = new StreamWriter(path + "\\" + nombre + "\\" + archivo + contador.ToString() + ".txt");*/
 
                 //Valida con Productos Existentes
                 string queryvalida = "Select Distinct reference From ps_product_attribute";
@@ -109,6 +127,7 @@ namespace ActStocks
                     estado = 0;
                     log.ActualizaLogProceso(proceso, estado);
                     sw.WriteLine("Error en lectura de productos en Prestashop.");
+                    sw.WriteLine("************ Fin Proceso:  " + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + "");
                     return;
                 }
 
@@ -152,6 +171,7 @@ namespace ActStocks
                     estado = 0;
                     log.ActualizaLogProceso(proceso, estado);
                     sw.WriteLine("Error en limpiar tabla de Movimientos en Prestashop.");
+                    sw.WriteLine("************ Fin Proceso:  " + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + "");
                     return;
                 }
 
@@ -169,7 +189,7 @@ namespace ActStocks
                         //ejecucion
                         comm.ExecuteNonQuery();
                         //Actualizar Movimiento para no repetir
-                        ActualizaOrigen("11", row["mov_id"].ToString(), row["det_mov_id"].ToString());
+                        ActualizaOrigen(tienda, row["mov_id"].ToString(), row["det_mov_id"].ToString());
                     }
                     catch(Exception ex)
                     {
@@ -180,21 +200,45 @@ namespace ActStocks
                     }
                 }
 
-                log.ActualizaLogProceso(proceso, estado);
-                sw.Close();
+            string termino_proceso;
+            log.ActualizaLogProceso(proceso, estado);
+            if (estado == 1)
+            {
+                termino_proceso = "correctamente.";
+            }
+            else
+            {
+                termino_proceso = "con errores.";
+            }
+            sw.WriteLine("Se actualizaron " + cant_reg.ToString() + " registros.");
+            sw.WriteLine("El proceso terminó " + termino_proceso);
+            sw.WriteLine("************ Fin Proceso:  " + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + "");
         }
 
         public static void Main(string[] args)
         {
             ActStock exe = new ActStock();
 
-            exe.log.CreaLogProceso(exe.proceso);
+            exe.CrearArchivoLog();
+            sw.WriteLine("************ Inicio Proceso:  " + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + "");
 
-            DataTable tabla = new DataTable();
+            try
+            {
+                exe.log.CreaLogProceso(exe.proceso);
 
-            tabla = exe.ListaStocks("11");
+                DataTable tabla = new DataTable();
 
-            exe.ActualizaStocks(tabla);
+                tabla = exe.ListaStocks(exe.tienda);
+
+                exe.ActualizaStocks(tabla);
+                sw.Close();
+            }
+            catch (Exception ex)
+            {
+                exe.log.ActualizaLogProceso(exe.proceso, -1);
+                sw.WriteLine(ex.Message);
+                sw.Close();
+            }
         }
 
     }

@@ -9,6 +9,7 @@ using System.Data.SqlClient;
 using MySql.Data.MySqlClient;
 using LogProcesos;
 using System.IO;
+using System.Globalization;
 
 namespace ActPrecios
 {
@@ -23,6 +24,11 @@ namespace ActPrecios
         LogProceso log = new LogProceso();
 
         string proceso = "ActPrecios";
+        string archivo = "";
+        string moneda = "PEN";
+        string seccion = "5";
+        string tienda = "e-com";
+        public static StreamWriter sw;
 
         public DataTable ListaPrecios(string moneda, string seccion, string tienda)
         {
@@ -46,18 +52,34 @@ namespace ActPrecios
             return dt;
         }
 
+        public void CrearArchivoLog()
+        {
+            //datos para archivo LOG
+            string path = Environment.CurrentDirectory;
+            string nombre = "Log Errores";
+            string nom_archiv = DateTime.Today.ToString("yyyy.MM.dd") + " Log Actualiza Precios";
+            //crea directorio si no existe
+            if (!Directory.Exists(path + "\\" + nombre))
+            {   //Crea el directorio
+                DirectoryInfo di = Directory.CreateDirectory(path + "\\" + nombre);
+            }
+            //Crea el Writer
+            sw = File.AppendText(path + "\\" + nombre + "\\" + nom_archiv + ".txt");
+            archivo = path + "\\" + nombre + "\\" + nom_archiv + ".txt";
+        }
+        
+
         public void ActualizaPrecios(DataTable precios)
         {
             if (log.ValidaProceso(proceso) != 1)
             {
-                //datos generales
                 int estado = 1;
+                //datos generales
+                log.ActualizaLogProceso(proceso, -1);
                 mysql = oConexionMySql.getConexionMySQL();
                 mysql.Open();
-                //Actualiza estado a proceso abierto
-                log.ActualizaLogProceso(proceso, -1);
 
-                //datos para archivo LOG
+                /*//datos para archivo LOG
                 int contador = 1;
                 string path = Environment.CurrentDirectory;
                 string nombre = "Log Errores";
@@ -73,7 +95,7 @@ namespace ActPrecios
                     contador = contador + 1;
                 }
                 //Crea el Writer
-                StreamWriter sw = new StreamWriter(path + "\\" + nombre + "\\" + archivo + contador.ToString() + ".txt");
+                StreamWriter sw = new StreamWriter(path + "\\" + nombre + "\\" + archivo + contador.ToString() + ".txt");*/
 
                 //Valida con Productos Existentes
                 string queryvalida = "Select Distinct replace(reference,'-','') as id_product  From ps_product;";
@@ -90,6 +112,7 @@ namespace ActPrecios
                     estado = 0;
                     log.ActualizaLogProceso(proceso, estado);
                     sw.WriteLine("Error en lectura de productos en Prestashop.");
+                    sw.WriteLine("************ Fin Proceso:  " + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + "");
                     return;
                 }
 
@@ -99,25 +122,25 @@ namespace ActPrecios
                 Final.Clear();
 
                 //Validacion
-                string val;
+                //string val;
                 foreach (DataRow row1 in precios.Rows)
                 {
-                    val = "no";
+                    //val = "no";
                     foreach (DataRow row2 in Productos.Rows)
                     {
                         if(row1["product_id"].ToString()== row2["id_product"].ToString())
                         {
-                            val = "si";
+                            //val = "si";
                             Final.ImportRow(row1);
                             Productos.Rows.Remove(row2);
                             break;
                         }
                     }
-                    if (val == "no")
+                    /*if (val == "no")
                     {
                         estado = 0;
                         sw.WriteLine("No se encontró el producto " + row1["product_id"] + " en Prestashop.");
-                    }
+                    }*/
                 }
 
                 //Elimino datos anteriores
@@ -133,6 +156,7 @@ namespace ActPrecios
                     estado = 0;
                     log.ActualizaLogProceso(proceso, estado);
                     sw.WriteLine("Error en limpiar tabla de descuentos en Prestashop.");
+                    sw.WriteLine("************ Fin Proceso:  " + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + "");
                     return;
                 }*/
 
@@ -163,22 +187,51 @@ namespace ActPrecios
                     }
                 }
 
+                string termino_proceso;
                 log.ActualizaLogProceso(proceso, estado);
-                sw.Close();
+                if (estado == 1)
+                {
+                    termino_proceso = "correctamente.";
+                }
+                else
+                {
+                    termino_proceso = "con errores.";
+                }
+                sw.WriteLine("Se actualizaron " + cant_reg.ToString() + " registros.");
+                sw.WriteLine("El proceso terminó " + termino_proceso);
             }
+            else
+            {
+                sw.WriteLine("El proceso se aborto por el flag de control.");
+            }
+            sw.WriteLine("************ Fin Proceso:  " + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + "");
         }
 
         public static void Main(string[] args)
         {
             ActPrecio exe = new ActPrecio();
 
-            exe.log.CreaLogProceso(exe.proceso);
+            exe.CrearArchivoLog();
+            sw.WriteLine("************ Inicio Proceso:  " + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + "");
 
-            DataTable tabla = new DataTable();
+            try
+            {
+                exe.log.CreaLogProceso(exe.proceso);
+                
+                DataTable tabla = new DataTable();
 
-            tabla = exe.ListaPrecios("PEN","5","e-com");
+                tabla = exe.ListaPrecios(exe.moneda, exe.seccion, exe.tienda);
 
-            exe.ActualizaPrecios(tabla);
+                exe.ActualizaPrecios(tabla);
+                sw.Close();
+            }
+            catch (Exception ex)
+            {
+                exe.log.ActualizaLogProceso(exe.proceso, -1);
+                sw.WriteLine(ex.Message);
+                sw.Close();
+            }
+
         }
 
     }

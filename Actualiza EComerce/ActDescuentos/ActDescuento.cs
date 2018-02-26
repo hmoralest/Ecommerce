@@ -23,6 +23,9 @@ namespace ActDescuentos
         LogProceso log = new LogProceso();
 
         string proceso = "ActDescuentos";
+        string archivo = "";
+        string tienda = "e-com";
+        public static StreamWriter sw;
 
         public DataTable ListaDescuentos(string tienda)
         {
@@ -43,6 +46,21 @@ namespace ActDescuentos
 
             return dt;
         }
+        public void CrearArchivoLog()
+        {
+            //datos para archivo LOG
+            string path = Environment.CurrentDirectory;
+            string nombre = "Log Errores";
+            string nom_archiv = DateTime.Today.ToString("yyyy.MM.dd") + " Log Actualiza Descuentos";
+            //crea directorio si no existe
+            if (!Directory.Exists(path + "\\" + nombre))
+            {   //Crea el directorio
+                DirectoryInfo di = Directory.CreateDirectory(path + "\\" + nombre);
+            }
+            //Crea el Writer
+            sw = File.AppendText(path + "\\" + nombre + "\\" + nom_archiv + ".txt");
+            archivo = path + "\\" + nombre + "\\" + nom_archiv + ".txt";
+        }
 
         public void ActualizaDescuentos(DataTable descuentos)
         {
@@ -55,7 +73,7 @@ namespace ActDescuentos
                 //Actualiza estado a proceso abierto
                 log.ActualizaLogProceso(proceso, -1);
 
-                //datos para archivo LOG
+                /*//datos para archivo LOG
                 int contador = 1;
                 string path = Environment.CurrentDirectory;
                 string nombre = "Log Errores";
@@ -71,7 +89,7 @@ namespace ActDescuentos
                     contador = contador + 1;
                 }
                 //Crea el Writer
-                StreamWriter sw = new StreamWriter(path + "\\" + nombre + "\\" + archivo + contador.ToString() + ".txt");
+                StreamWriter sw = new StreamWriter(path + "\\" + nombre + "\\" + archivo + contador.ToString() + ".txt");*/
 
                 //Valida con Productos Existentes
                 string queryvalida = "Select Distinct replace(reference,'-','') as id_product  From ps_product;";
@@ -88,6 +106,7 @@ namespace ActDescuentos
                     estado = 0;
                     log.ActualizaLogProceso(proceso, estado);
                     sw.WriteLine("Error en lectura de productos en Prestashop.");
+                    sw.WriteLine("************ Fin Proceso:  " + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + "");
                     return;
                 }
 
@@ -97,18 +116,25 @@ namespace ActDescuentos
                 Final.Clear();
 
                 //Validacion
+                //string val;
                 foreach (DataRow row1 in descuentos.Rows)
                 {
+                    //val = "no";
                     foreach (DataRow row2 in Productos.Rows)
                     {
                         if(row1["product_id"].ToString()== row2["id_product"].ToString())
                         {
+                            //val = "si";
                             Final.ImportRow(row1);
                             Productos.Rows.Remove(row2);
-                            //descuentos.Rows.Remove(row1);
                             break;
                         }
                     }
+                    /*if (val == "no")
+                    {
+                        estado = 0;
+                        sw.WriteLine("No se encontró el producto " + row1["product_id"] + " en Prestashop.");
+                    }*/
                 }
 
                 //Elimino datos anteriores
@@ -124,6 +150,7 @@ namespace ActDescuentos
                     estado = 0;
                     log.ActualizaLogProceso(proceso, estado);
                     sw.WriteLine("Error en limpiar tabla de descuentos en Prestashop.");
+                    sw.WriteLine("************ Fin Proceso:  " + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + "");
                     return;
                 }
 
@@ -152,23 +179,51 @@ namespace ActDescuentos
                         sw.WriteLine("Error en ingresar descuentos de producto " + row["product_id"] + " y descuento " + row["Monto"] + " en Prestashop.");
                     }
                 }
-
+                string termino_proceso;
                 log.ActualizaLogProceso(proceso, estado);
-                sw.Close();
+                if (estado == 1)
+                {
+                    termino_proceso = "correctamente.";
+                }
+                else
+                {
+                    termino_proceso = "con errores.";
+                }
+                sw.WriteLine("Se actualizaron " + cant_reg.ToString() + " registros.");
+                sw.WriteLine("El proceso terminó " + termino_proceso);
+
             }
+            else
+            {
+                sw.WriteLine("El proceso se aborto por el flag de control.");
+            }
+            sw.WriteLine("************ Fin Proceso:  " + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + "");
         }
 
         public static void Main(string[] args)
         {
             ActDescuento exe = new ActDescuento();
 
-            exe.log.CreaLogProceso(exe.proceso);
+            exe.CrearArchivoLog();
+            sw.WriteLine("************ Inicio Proceso:  " + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + "");
 
-            DataTable tabla = new DataTable();
+            try
+            {
+                exe.log.CreaLogProceso(exe.proceso);
 
-            tabla = exe.ListaDescuentos("e-com");
+                DataTable tabla = new DataTable();
 
-            exe.ActualizaDescuentos(tabla);
+                tabla = exe.ListaDescuentos(exe.tienda);
+
+                exe.ActualizaDescuentos(tabla);
+                sw.Close();
+            }
+            catch (Exception ex)
+            {
+                exe.log.ActualizaLogProceso(exe.proceso, -1);
+                sw.WriteLine(ex.Message);
+                sw.Close();
+            }
         }
 
     }
