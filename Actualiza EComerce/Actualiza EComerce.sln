@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ActPrecios", "ActPrecios\Ac
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ActStocks", "ActStocks\ActStocks.csproj", "{9FAFF3CA-5CB6-4926-A536-A694D33BDEC9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ActTrackings", "ActTracking\ActTrackings.csproj", "{B06E2913-576D-47B7-A5B2-31D9E39272AA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{9FAFF3CA-5CB6-4926-A536-A694D33BDEC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9FAFF3CA-5CB6-4926-A536-A694D33BDEC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9FAFF3CA-5CB6-4926-A536-A694D33BDEC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B06E2913-576D-47B7-A5B2-31D9E39272AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B06E2913-576D-47B7-A5B2-31D9E39272AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B06E2913-576D-47B7-A5B2-31D9E39272AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B06E2913-576D-47B7-A5B2-31D9E39272AA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

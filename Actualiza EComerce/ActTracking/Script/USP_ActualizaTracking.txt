@@ -1,0 +1,38 @@
+DROP PROCEDURE IF EXISTS USP_ActualizaTracking;
+
+DELIMITER //
+
+CREATE procedure USP_ActualizaTracking(ref_order varchar(9), tracking varchar(64))
+BEGIN
+	DECLARE ierr INT DEFAULT 0;
+	declare orden		int;
+
+	DECLARE CONTINUE HANDLER FOR SQLEXCEPTION  SET ierr = 1;
+	DECLARE CONTINUE HANDLER FOR SQLWARNING  SET ierr = 1;
+
+	START TRANSACTION;
+
+		Select id_order
+		From ps_orders
+		Where reference = ref_order
+		Into orden;
+
+		Update ps_orders
+		Set shipping_number = tracking
+		Where id_order = orden;
+
+		Update ps_order_carrier
+		Set tracking_number = tracking
+		Where id_order = orden;
+
+	IF  ierr=1 THEN
+		SELECT 0 as error;
+		ROLLBACK;
+	ELSE
+		SELECT 1 as error;
+		COMMIT;
+	END IF;
+
+END//
+
+DELIMITER ;

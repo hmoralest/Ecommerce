@@ -1,0 +1,10 @@
+D:\ECommerce\Actualiza EComerce\ActTracking\bin\Debug\ActTrackings.exe.config
+D:\ECommerce\Actualiza EComerce\ActTracking\bin\Debug\ActTrackings.exe
+D:\ECommerce\Actualiza EComerce\ActTracking\bin\Debug\ActTrackings.pdb
+D:\ECommerce\Actualiza EComerce\ActTracking\bin\Debug\LogProcesos.dll
+D:\ECommerce\Actualiza EComerce\ActTracking\bin\Debug\MySql.Data.dll
+D:\ECommerce\Actualiza EComerce\ActTracking\bin\Debug\LogProcesos.pdb
+D:\ECommerce\Actualiza EComerce\ActTracking\bin\Debug\MySql.Data.xml
+D:\ECommerce\Actualiza EComerce\ActTracking\obj\Debug\ActTrackings.csprojResolveAssemblyReference.cache
+D:\ECommerce\Actualiza EComerce\ActTracking\obj\Debug\ActTrackings.exe
+D:\ECommerce\Actualiza EComerce\ActTracking\obj\Debug\ActTrackings.pdb

@@ -16,3 +16,6 @@ D:\ECommerce\PrestasharpChristian\PrestasharpChristian\bin\Debug\Bukimedia.Prest
 D:\ECommerce\PrestasharpChristian\PrestasharpChristian\bin\Debug\RestSharp.dll
 D:\ECommerce\PrestasharpChristian\PrestasharpChristian\bin\Debug\RestSharp.xml
 D:\ECommerce\PrestasharpChristian\PrestasharpChristian\obj\Debug\PrestasharpChristian.csprojResolveAssemblyReference.cache
+D:\ECommerce\CrearPedidosMasivo\PrestasharpChristian\bin\Debug\PrestasharpChristian.exe.config
+D:\ECommerce\CrearPedidosMasivo\PrestasharpChristian\obj\Debug\PrestasharpChristian.exe
+D:\ECommerce\CrearPedidosMasivo\PrestasharpChristian\obj\Debug\PrestasharpChristian.pdb

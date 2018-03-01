@@ -1,0 +1,10 @@
+D:\ECommerce\Actualiza EComerce\ActPrecios\bin\Debug\ActPrecios.exe.config
+D:\ECommerce\Actualiza EComerce\ActPrecios\bin\Debug\ActPrecios.exe
+D:\ECommerce\Actualiza EComerce\ActPrecios\bin\Debug\ActPrecios.pdb
+D:\ECommerce\Actualiza EComerce\ActPrecios\bin\Debug\LogProcesos.dll
+D:\ECommerce\Actualiza EComerce\ActPrecios\bin\Debug\MySql.Data.dll
+D:\ECommerce\Actualiza EComerce\ActPrecios\bin\Debug\LogProcesos.pdb
+D:\ECommerce\Actualiza EComerce\ActPrecios\bin\Debug\MySql.Data.xml
+D:\ECommerce\Actualiza EComerce\ActPrecios\obj\Debug\ActPrecios.csprojResolveAssemblyReference.cache
+D:\ECommerce\Actualiza EComerce\ActPrecios\obj\Debug\ActPrecios.exe
+D:\ECommerce\Actualiza EComerce\ActPrecios\obj\Debug\ActPrecios.pdb
