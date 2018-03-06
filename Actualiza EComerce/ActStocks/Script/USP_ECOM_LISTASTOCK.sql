@@ -24,6 +24,7 @@ BEGIN
 	Select	Substring(det.Mov_Det_ArtId,1,3)+'-'+Substring(det.Mov_Det_ArtId,4,9)+'-'+det.Mov_Det_TalId			As product_id,
 			Case Mov_ConId	When '30'	Then det.Mov_Det_Cantidad
 							When '31'	Then det.Mov_Det_Cantidad * (0-1)
+							Else			 0
 			END																	As cantidad,
 			mov.Mov_Fecha														As fecha,
 			mov.Mov_Id															As mov_id,
@@ -33,7 +34,8 @@ BEGIN
 			On mov.Mov_Id = det.Mov_Det_Id
 	Where mov.Mov_AlmId = @tienda
 	  And mov.Mov_EstId = 'A'
-	  And isnull(mov.Mov_EstPS,'') <> 'P';
+	  And isnull(mov.Mov_EstPS,'') <> 'P'
+	  And Mov_ConId IN ('30','31');
 
 END
 GO

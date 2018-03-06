@@ -179,7 +179,7 @@ namespace ActStocks
                 cant_reg = cant_reg + 1;
                 //Actualizar en Prestashop
                 MySqlCommand comm = mysql.CreateCommand();
-                comm.CommandText = "Insert into ps_erp values ('" + row["product_id"] + "'," + row["cantidad"] + ");";
+                comm.CommandText = "Insert into ps_erp (ref_product, stock) values ('" + row["product_id"] + "'," + row["cantidad"] + ");";
 
                 try
                 {

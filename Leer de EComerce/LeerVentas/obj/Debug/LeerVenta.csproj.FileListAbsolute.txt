@@ -1,0 +1,6 @@
+D:\ECommerce\Leer de EComerce\LeerVentas\bin\Debug\LeerVenta.exe.config
+D:\ECommerce\Leer de EComerce\LeerVentas\bin\Debug\LeerVenta.exe
+D:\ECommerce\Leer de EComerce\LeerVentas\bin\Debug\LeerVenta.pdb
+D:\ECommerce\Leer de EComerce\LeerVentas\obj\Debug\LeerVenta.exe
+D:\ECommerce\Leer de EComerce\LeerVentas\obj\Debug\LeerVenta.pdb
+D:\ECommerce\Leer de EComerce\LeerVentas\obj\Debug\LeerVenta.csprojResolveAssemblyReference.cache

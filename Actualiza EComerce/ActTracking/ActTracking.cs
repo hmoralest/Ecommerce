@@ -48,7 +48,7 @@ namespace ActTrackings
 
                     while (dr.Read())
                     {
-                        result = Convert.ToString(dr["exe"]);
+                        result = Convert.ToString(dr["error"]);
                     }
                     mysql.Close();
                 }

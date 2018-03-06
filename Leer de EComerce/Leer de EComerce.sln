@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeerPedido", "LeerPedido\Le
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebServices", "Servicios\WebServices.csproj", "{99D40EE0-4ED8-45B6-A7C6-C253066B5A8C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeerVenta", "LeerVentas\LeerVenta.csproj", "{B06E2913-576D-47B7-A5B2-31D9E39272AA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{99D40EE0-4ED8-45B6-A7C6-C253066B5A8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{99D40EE0-4ED8-45B6-A7C6-C253066B5A8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{99D40EE0-4ED8-45B6-A7C6-C253066B5A8C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B06E2913-576D-47B7-A5B2-31D9E39272AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B06E2913-576D-47B7-A5B2-31D9E39272AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B06E2913-576D-47B7-A5B2-31D9E39272AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B06E2913-576D-47B7-A5B2-31D9E39272AA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
