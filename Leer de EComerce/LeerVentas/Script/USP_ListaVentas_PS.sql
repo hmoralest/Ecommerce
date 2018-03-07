@@ -7,22 +7,29 @@ GO
 -- Create date	: 02-03-2018
 -- Description	: Lista Ventas Realizadas en PS para envío a Almacén
 -- =====================================================================
+-- Ven_EstAct_Alm	-> NULL	= Creado
+--					-> ''	= RollBack
+--					-> 'P'	= Procesado
+--					-> 'E'	= Error en Validacion
+-- =====================================================================
+-- Modificado por	: Henry Morales
+-- Fch Modifica		: 07/03/2018
+-- Asunto			: Se agregó filtro para no tomar los que no pasaron validación
+-- =====================================================================
 /*
 	Exec USP_ListaVentas_PS '11'
 */
 
 CREATE Procedure USP_ListaVentas_PS(
-	/*@moneda		Varchar(3),
-	@seccion	Varchar(1),	/*retail (5); no retail (6)*/*/
 	@tienda		Varchar(1)
 )
 AS 
 BEGIN
 
-	/*Select  
+	Select  
 			vta.Ven_Id									As id_venta,
-			CASE WHEN LEFT(vta.Ven_Id) = 'F' THEN 'FAC'
-				 WHEN LEFT(vta.Ven_Id) = 'B' THEN 'BOL'
+			CASE WHEN LEFT(vta.Ven_Id,1) = 'F' THEN 'FAC'
+				 WHEN LEFT(vta.Ven_Id,1) = 'B' THEN 'BOL'
 			END										As tpdoc,
 			vta.Ven_Id									As nro_doc,
 			'PED'										As tp_ped,
@@ -42,15 +49,15 @@ BEGIN
 			det.Ven_Det_ComisionM				As comision,
 			art.Art_Gru_Talla				As tipo_med,
 			gru.Gru_Tal_Col				As col_med,
-			''						As estandar_consig,
-			''						As linea,
+			art.Art_Flagc						As estandar_consig,
+			art.Art_Merc					As linea,
 			art.Art_Mar_Id						As marca,
 			scat.Sca_CodCat						As categ,
 			scat.Sca_CodSubCat					As subcat,
-			''						As rims_linea,
-			''						As rims_categ,
-			''						As rims_subcat,
-			''						As rims_marca
+			art.Art_Merc3						As rims_linea,
+			art.Art_Cate3						As rims_categ,
+			art.Art_SubC3						As rims_subcat,
+			art.Art_Marc3						As rims_marca
 	From Venta vta
 		Inner Join Venta_Detalle det
 			On vta.Ven_Id = det.Ven_Det_Id
@@ -61,152 +68,7 @@ BEGIN
 		Inner Join SubCategoria scat
 			On art.Art_SubCat_Id = scat.Sca_Id
 	Where vta.Ven_Alm_Id = @tienda
-	  And isnull(vta.Ven_EstAct_Alm,'')<>'P'*/
-
-	Select
-		'66800003794'									As id_Venta,
-			'FAC'										As tpdoc,
-			'00000001'									As nro_doc,
-			'PED'										As tp_ped,
-			'SQE1E21'									As cod_ped,
-		'17/07/2014'			As fecha_vta,
-		'1539'			As hora_vta,
-		'05/03/2018'			As fecha_reg,
-		'1500'			As hora_reg,
-		'5814925'							As product_id,
-			'1'											As calidad,
-			2					As cant_no_calzado,
-			0					As cant_calzado,
-			10					As costo,
-			20					As precio,
-			2				As comision,
-			'D'				As tipo_med,
-			'4'				As col_med,
-			''						As estandar_consig,
-			''						As linea,
-			'23'						As marca,
-			'04'						As categ,
-			8					As subcat,
-			''						As rims_linea,
-			''						As rims_categ,
-			''						As rims_subcat,
-			''						As rims_marca
-	UNION
-	Select
-		'66800003794'									As id_Venta,
-			'FAC'										As tpdoc,
-			'00000001'									As nro_doc,
-			'PED'										As tp_ped,
-			'SQE1E21'									As cod_ped,
-		'17/07/2014'			As fecha_vta,
-		'1539'			As hora_vta,
-		'05/03/2018'			As fecha_reg,
-		'1500'			As hora_reg,
-		'8892976'							As product_id,
-			'1'											As calidad,
-			0					As cant_no_calzado,
-			1					As cant_calzado,
-			22.5					As costo,
-			94.5					As precio,
-			15.5				As comision,
-			'D'				As tipo_med,
-			'4'				As col_med,
-			''						As estandar_consig,
-			''						As linea,
-			'06'						As marca,
-			'38'						As categ,
-			'21'					As subcat,
-			''						As rims_linea,
-			''						As rims_categ,
-			''						As rims_subcat,
-			''						As rims_marca
-	UNION
-	Select
-		'66800003794'									As id_Venta,
-			'FAC'										As tpdoc,
-			'00000001'									As nro_doc,
-			'PED'										As tp_ped,
-			'SQE1E21'									As cod_ped,
-		'17/07/2014'			As fecha_vta,
-		'1539'			As hora_vta,
-		'05/03/2018'			As fecha_reg,
-		'1500'			As hora_reg,
-		'8899976'							As product_id,
-			'1'											As calidad,
-			1					As cant_no_calzado,
-			0					As cant_calzado,
-			58.07					As costo,
-			97.89					As precio,
-			11.61				As comision,
-			'A'				As tipo_med,
-			'1'				As col_med,
-			''						As estandar_consig,
-			''						As linea,
-			'02'						As marca,
-			'20'						As categ,
-			'89'					As subcat,
-			''						As rims_linea,
-			''						As rims_categ,
-			''						As rims_subcat,
-			''						As rims_marca
-	UNION
-	Select
-		'66800003795'									As id_Venta,
-			'FAC'										As tpdoc,
-			'00000001'									As nro_doc,
-			'PED'										As tp_ped,
-			'SQE1E21'									As cod_ped,
-		'17/07/2014'			As fecha_vta,
-		'1539'			As hora_vta,
-		'05/03/2018'			As fecha_reg,
-		'1500'			As hora_reg,
-		'5538812'							As product_id,
-			'1'											As calidad,
-			1					As cant_no_calzado,
-			0					As cant_calzado,
-			15.22					As costo,
-		39.90					As precio,
-		15.96				As comision,
-			'A'				As tipo_med,
-			'1'				As col_med,
-			''						As estandar_consig,
-			''						As linea,
-			'02'						As marca,
-			'20'						As categ,
-			'89'					As subcat,
-			''						As rims_linea,
-			''						As rims_categ,
-			''						As rims_subcat,
-			''						As rims_marca
-	UNION
-	Select
-		'66800003795'									As id_Venta,
-			'FAC'										As tpdoc,
-			'00000001'									As nro_doc,
-			'PED'										As tp_ped,
-			'SQE1E21'									As cod_ped,
-		'17/07/2014'			As fecha_vta,
-		'1539'			As hora_vta,
-		'05/03/2018'			As fecha_reg,
-		'1500'			As hora_reg,
-		'2098924'							As product_id,
-			'1'											As calidad,
-			0					As cant_no_calzado,
-			2					As cant_calzado,
-			15.22					As costo,
-		41.46					As precio,
-		16.58				As comision,
-			'D'				As tipo_med,
-			'3'				As col_med,
-			''						As estandar_consig,
-			''						As linea,
-			'02'						As marca,
-			'20'						As categ,
-			'89'					As subcat,
-			''						As rims_linea,
-			''						As rims_categ,
-			''						As rims_subcat,
-			''						As rims_marca
+	  And isnull(vta.Ven_EstAct_Alm,'') NOT IN ('P','E')
 
 END
 

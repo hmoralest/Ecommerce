@@ -15,7 +15,7 @@ namespace LeerVentas
     {
         Conexion oConexion = new Conexion();
 
-        string path = "D:\\Actualizar Stock Almacen con Ventas\\Tablas\\SCACODI.DBF";
+        string path = "D:\\Actualizar Stock Almacen con Ventas\\Tablas\\";
 
         string tienda = "11"; //SQL
 
@@ -54,6 +54,29 @@ namespace LeerVentas
             }
             return result;
         }
+        public DataTable ListaProductoVentas()
+        {
+            DataTable result = new DataTable();
+
+            using (SqlConnection sql = oConexion.getConexionSQL())
+            {
+                try
+                {
+                    sql.Open();
+                    SqlDataAdapter da = new SqlDataAdapter("USP_ListaProdVentas_PS", sql);
+                    da.SelectCommand.CommandType = CommandType.StoredProcedure;
+                    da.SelectCommand.Parameters.Add("@tienda", SqlDbType.VarChar).Value = tienda;
+
+                    da.Fill(result);
+                    sql.Close();
+                }
+                catch (Exception Ex)
+                {
+                    throw Ex;
+                }
+            }
+            return result;
+        }
 
         public void ActualizaVentas(string id_venta, string estado)
         {
@@ -82,12 +105,139 @@ namespace LeerVentas
                 }
             }
         }
-        private void ActualizaenDBF(DataTable datos)
+
+        public void ActualizaLogVentas(string id_venta, string mensaje, string msje_sist)
+        {
+
+            using (SqlConnection sql = oConexion.getConexionSQL())
+            {
+                try
+                {
+                    sql.Open();
+                    SqlCommand cmd = new SqlCommand();
+
+                    cmd.CommandText = "USP_Agrega_LogVentas";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Connection = sql;
+
+                    cmd.Parameters.Add("@id_venta", SqlDbType.VarChar).Value = id_venta;
+                    cmd.Parameters.Add("@mensaje", SqlDbType.VarChar).Value = mensaje;
+                    cmd.Parameters.Add("@sistema", SqlDbType.VarChar).Value = msje_sist;
+
+                    cmd.ExecuteNonQuery();
+
+                    sql.Close();
+                }
+                catch (Exception Ex)
+                {
+                    throw Ex;
+                }
+            }
+        }
+
+        public void Envia_correo()
+        {
+
+            using (SqlConnection sql = oConexion.getConexionSQL())
+            {
+                try
+                {
+                    sql.Open();
+                    SqlCommand cmd = new SqlCommand();
+
+                    cmd.CommandText = "USP_CorreoAlmacen_PS";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Connection = sql;
+                    
+                    cmd.ExecuteNonQuery();
+
+                    sql.Close();
+                }
+                catch (Exception Ex)
+                {
+                    throw Ex;
+                }
+            }
+        }
+
+        private void ValidaProductoVentas()
+        {
+            // Gets the Calendar instance associated with a CultureInfo.
+            CultureInfo myCI = new CultureInfo("en-US");
+            Calendar myCal = myCI.Calendar;
+            // Gets the DTFI properties required by GetWeekOfYear.
+            CalendarWeekRule myCWR = myCI.DateTimeFormat.CalendarWeekRule;
+            DayOfWeek myFirstDOW = myCI.DateTimeFormat.FirstDayOfWeek;
+
+            //string sConn = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + System.IO.Path.GetDirectoryName(path) + ";Extended Properties=dBASE IV;";
+            string sConn = "Provider = vfpoledb.1;Data Source=" + System.IO.Path.GetDirectoryName(path) + ";Collating Sequence=general";
+
+            DataTable productos = new DataTable();
+            productos = ListaProductoVentas();
+
+            using (System.Data.OleDb.OleDbConnection dbConn = new System.Data.OleDb.OleDbConnection(sConn))
+            {
+                try
+                {
+                    dbConn.Open();
+                }
+                catch (Exception ex)
+                {
+                    ActualizaLogVentas("", "Error en encontrar DBF.", ex.Message);
+                }
+                foreach (DataRow row in productos.Rows)
+                {
+                    int weekofyear = myCal.GetWeekOfYear(Convert.ToDateTime(row["fecha"]), myCWR, myFirstDOW);
+
+                    try
+                    {
+                        string stock_pri = "SELECT * FROM SCACSAL WHERE CSAL_EMPRE ='" + empresa + "' And CSAL_ANO = '" + Convert.ToDateTime(row["fecha"]).ToString("yyyy") + "' And CSAL_SEMAN = '" + weekofyear.ToString().PadLeft(2).Replace(" ", "0") + "' And CSAL_ALMAC = '" + almacen + "' And CSAL_ARTIC='" + row["producto"].ToString() + "' And CSAL_CALID = '" + calidad + "'";
+                        System.Data.OleDb.OleDbCommand stk1 = new System.Data.OleDb.OleDbCommand(stock_pri, dbConn);
+                        System.Data.OleDb.OleDbDataAdapter cn_stk1 = new System.Data.OleDb.OleDbDataAdapter(stk1);
+                        DataTable stock1 = new DataTable();
+                        cn_stk1.Fill(stock1);
+
+                        string stock_seg = "SELECT * FROM SCACSALP WHERE CSAL_EMPRE ='" + empresa + "' And CSAL_ANO = '" + Convert.ToDateTime(row["fecha"]).ToString("yyyy") + "' And CSAL_SEMAN = '" + weekofyear.ToString().PadLeft(2).Replace(" ", "0") + "' And CSAL_ALMAC = '" + almacen + "' And CSAL_ARTIC='" + row["producto"].ToString() + "' And CSAL_CALID = '" + calidad + "'";
+                        System.Data.OleDb.OleDbCommand stk2 = new System.Data.OleDb.OleDbCommand(stock_seg, dbConn);
+                        System.Data.OleDb.OleDbDataAdapter cn_stk2 = new System.Data.OleDb.OleDbDataAdapter(stk2);
+                        DataTable stock2 = new DataTable();
+                        cn_stk2.Fill(stock2);
+
+                        if (stock1.Rows.Count == 0 || stock2.Rows.Count == 0)
+                        {
+                            ActualizaVentas(row["id"].ToString(), "E");
+                            ActualizaLogVentas(row["id"].ToString(), "Producto " + row["producto"].ToString() + " no tiene registro semanal.", "Tablas SCACSAL y SCACSALP");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        ActualizaLogVentas("", "Error en Validación de Productos.", ex.Message);
+                    }
+                }
+                try
+                {
+                    //Se termina transacción y cerramos conexión
+                    dbConn.Close();
+                }
+                catch (Exception ex)
+                {
+                    ActualizaLogVentas("", "Error en Cierre de Conexión a DBF.", ex.Message);
+                }
+            }
+        }
+
+        private void ActualizaenDBF()
         {
             //string sConn = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + System.IO.Path.GetDirectoryName(path) + ";Extended Properties=dBASE IV;";
             string sConn = "Provider = vfpoledb.1;Data Source=" + System.IO.Path.GetDirectoryName(path) + ";Collating Sequence=general";
             string producto = "";
             string validavta = "";
+            // Gets the Calendar instance associated with a CultureInfo.
+            CultureInfo myCI = new CultureInfo("en-US");
+            Calendar myCal = myCI.Calendar;
+            // Gets the DTFI properties required by GetWeekOfYear.
+            CalendarWeekRule myCWR = myCI.DateTimeFormat.CalendarWeekRule;
+            DayOfWeek myFirstDOW = myCI.DateTimeFormat.FirstDayOfWeek;
 
             //validacion de errores
             bool ActSCACODI = false;
@@ -105,6 +255,24 @@ namespace LeerVentas
             List<string[]> scasal = new List<string[]>();
             List<string[]> scasalp = new List<string[]>();
 
+            //Valida semanas anteriores
+            int min_week = Convert.ToInt32(Hoy.ToString("yyyy")+ Convert.ToString(myCal.GetWeekOfYear(Hoy, myCWR, myFirstDOW)).PadLeft(2).Replace(" ", "0"));
+
+            DataTable datos = new DataTable();
+
+            try
+            {
+                ValidaProductoVentas();
+
+                //Lleno datos iniciales
+                datos = ListaVentas();
+            }
+            catch (Exception ex)
+            {
+                ActualizaLogVentas("", "Error en Obtención de datos de SLQ Server.", ex.Message);
+                return;
+            }
+
             using (System.Data.OleDb.OleDbConnection dbConn = new System.Data.OleDb.OleDbConnection(sConn))
             {
                 //System.Data.OleDb.OleDbTransaction tran;
@@ -117,7 +285,8 @@ namespace LeerVentas
                 }
                 catch(Exception ex)
                 {
-                    throw ex;
+                    ActualizaLogVentas("", "Error en encontrar DBF.", ex.Message);
+                    //throw ex;
                 }
 
                 foreach(DataRow venta in datos.Rows)
@@ -128,14 +297,12 @@ namespace LeerVentas
                     string codigo1 = "";
                     string codigo2 = "";
 
-                    // Gets the Calendar instance associated with a CultureInfo.
-                    CultureInfo myCI = new CultureInfo("en-US");
-                    Calendar myCal = myCI.Calendar;
-                    // Gets the DTFI properties required by GetWeekOfYear.
-                    CalendarWeekRule myCWR = myCI.DateTimeFormat.CalendarWeekRule;
-                    DayOfWeek myFirstDOW = myCI.DateTimeFormat.FirstDayOfWeek;
-                    int weekofyear = myCal.GetWeekOfYear(Hoy, myCWR, myFirstDOW);
-
+                    int weekofyear = myCal.GetWeekOfYear(Convert.ToDateTime(venta["fecha_vta"]), myCWR, myFirstDOW);
+                    //Valida la menor semana q se está actualizando
+                    if(Convert.ToInt32(Convert.ToDateTime(venta["fecha_vta"]).ToString("yyyy") + Convert.ToString(weekofyear).PadLeft(2).Replace(" ", "0")) < min_week)
+                    {
+                        min_week = Convert.ToInt32(Convert.ToDateTime(venta["fecha_vta"]).ToString("yyyy") + Convert.ToString(weekofyear).PadLeft(2).Replace(" ", "0"));
+                    }
                     try
                     {
 
@@ -272,19 +439,20 @@ namespace LeerVentas
                         // Busco datos del producto en tabla 1
                         //-------------------------------------
                         //string stock_pri = "SELECT * FROM SCACSAL WHERE CSAL_ANO = '"+ Hoy.ToString("yyyy")+ "' And CSAL_SEMAN = '"+weekofyear.ToString().PadLeft(2).Replace(" ", "0") + "' And CSAL_ALMAC = '"+almacen+ "' And CSAL_ARTIC='"+producto+ "' And CSAL_CALID = '"+calidad+ "' And CSAL_EMPRE ='"+empresa+"'";
-                        string stock_pri = "SELECT * FROM SCACSAL WHERE CSAL_EMPRE+CSAL_ANO+CSAL_SEMAN+CSAL_CODAL+CSAL_CALID+CSAL_ARTIC = '" + empresa + Hoy.ToString("yyyy") + weekofyear.ToString().PadLeft(2).Replace(" ", "0") + almacen + calidad + producto + "'";
+                        /*string stock_pri = "SELECT * FROM SCACSAL WHERE CSAL_EMPRE ='" + empresa + "' And CSAL_ANO = '" + Convert.ToDateTime(venta["fecha_vta"]).ToString("yyyy") + "' And CSAL_SEMAN = '" + weekofyear.ToString().PadLeft(2).Replace(" ", "0") + "' And CSAL_ALMAC = '" + almacen + "' And CSAL_CALID = '" + calidad + "' And CSAL_ARTIC='" + producto + "'";
                         System.Data.OleDb.OleDbCommand stk1 = new System.Data.OleDb.OleDbCommand(stock_pri, dbConn);
                         System.Data.OleDb.OleDbDataAdapter cn_stk1 = new System.Data.OleDb.OleDbDataAdapter(stk1);
                         DataTable stock1 = new DataTable();
                         //stk1.Transaction = tran;
-                        cn_stk1.Fill(stock1);
+                        cn_stk1.Fill(stock1);*/
 
                         string act_stock_pri="";
                         //Validar si existe                                                                                                                                             
-                        if(stock1.Rows.Count == 0)
-                        {
+                        //if(stock1.Rows.Count == 0)
+                        //{
+                            
                             // Se lanza error para que no registre a menos que haya cierre semanal.
-                            throw new System.ArgumentException("Producto "+ producto+" no tiene registro semanal.", "SCACSAL");
+                            //throw new System.ArgumentException("Producto "+ producto+" no tiene registro semanal.", "SCACSAL");
                             // Se toma datos de la semana anterior para crear un nuevo registro
                             /*string stock_pri_ant = "SELECT * FROM SCACSAL WHERE CSAL_ANO = '" + Hoy.ToString("yyyy") + "' And CSAL_SEMAN = '" + (weekofyear-1).ToString().PadLeft(2).Replace(" ", "0") + "' And CSAL_ALMAC = '" + almacen + "' And CSAL_ARTIC='" + producto + "' And CSAL_CALID = '1'";
                             System.Data.OleDb.OleDbCommand stk1_ant = new System.Data.OleDb.OleDbCommand(stock_pri_ant, dbConn);
@@ -303,42 +471,42 @@ namespace LeerVentas
                             act_stk1.Transaction = tran;
                             act_stk1.ExecuteNonQuery();
                             InsSCACSAL = true;*/
-                        }
+                        /*}
                         else
-                        {
+                        {*/
                             // Actualizo datos del registro que se tiene 
-                            foreach (DataRow dat in stock1.Rows)
-                            {
+                            //foreach (DataRow dat in stock1.Rows)
+                            //{
                                 datscasal[0] = producto;
                                 datscasal[1] = Convert.ToString(Convert.ToInt32(venta["cant_calzado"]) + Convert.ToInt32(venta["cant_no_calzado"]));
                                 datscasal[2] = venta["col_med"].ToString();
-                                act_stock_pri = "UPDATE SCACSAL SET CSAL_STKTO=CSAL_STKTO-" + datscasal[1] + ", CSAL_SALNO = CSAL_SALNO+" + datscasal[1] + ",CSAL_MED"+ venta["col_med"].ToString().PadLeft(2).Replace(" ", "0")+ "=CSAL_MED" + venta["col_med"].ToString().PadLeft(2).Replace(" ", "0") + "-" + datscasal[1] + " WHERE CSAL_ANO = '" + Hoy.ToString("yyyy") + "' And CSAL_SEMAN = '" + weekofyear.ToString().PadLeft(2).Replace(" ", "0") + "' And CSAL_ALMAC = '" + almacen + "' And CSAL_ARTIC='" + producto + "' And CSAL_CALID = '"+calidad+"' And CSAL_EMPRE ='" + empresa + "'";
-                            }
+                                act_stock_pri = "UPDATE SCACSAL SET CSAL_STKTO=CSAL_STKTO-" + datscasal[1] + ", CSAL_SALNO = CSAL_SALNO+" + datscasal[1] + ",CSAL_MED"+ venta["col_med"].ToString().PadLeft(2).Replace(" ", "0")+ "=CSAL_MED" + venta["col_med"].ToString().PadLeft(2).Replace(" ", "0") + "-" + datscasal[1] + " WHERE CSAL_EMPRE ='" + empresa + "' And CSAL_ANO = '" + Convert.ToDateTime(venta["fecha_vta"]).ToString("yyyy") + "' And CSAL_SEMAN = '" + weekofyear.ToString().PadLeft(2).Replace(" ", "0") + "' And CSAL_ALMAC = '" + almacen + "' And CSAL_CALID = '" + calidad + "' And CSAL_ARTIC='" + producto + "'";
+                            //}
                             // Se ejecuta sentencia
                             System.Data.OleDb.OleDbCommand act_stk1 = new System.Data.OleDb.OleDbCommand(act_stock_pri, dbConn);
                             //act_stk1.Transaction = tran;
                             act_stk1.ExecuteNonQuery();
                             scasal.Add(datscasal);
                             ActSCACSAL = true;
-                        }
+                        //}
 
                         //throw new System.ArgumentException("Código de Producto Inválido", "reference");
                         //-------------------------------------
                         // Busco datos del producto en tabla 2
                         //-------------------------------------
-                        string stock_seg = "SELECT * FROM SCACSALP WHERE CSAL_ANO = '" + Hoy.ToString("yyyy") + "' And CSAL_SEMAN = '" + weekofyear.ToString().PadLeft(2).Replace(" ", "0") + "' And CSAL_ALMAC = '" + almacen + "' And CSAL_ARTIC='" + producto + "' And CSAL_CALID = '"+calidad+ "' And CSAL_EMPRE ='" + empresa + "'";
+                        /*string stock_seg = "SELECT * FROM SCACSALP WHERE CSAL_EMPRE ='" + empresa + "' And CSAL_ANO = '" + Convert.ToDateTime(venta["fecha_vta"]).ToString("yyyy") + "' And CSAL_SEMAN = '" + weekofyear.ToString().PadLeft(2).Replace(" ", "0") + "' And CSAL_ALMAC = '" + almacen + "' And CSAL_CALID = '" + calidad + "' And CSAL_ARTIC='" + producto + "' And CSAL_CPACK='" + pack + "'";
                         System.Data.OleDb.OleDbCommand stk2 = new System.Data.OleDb.OleDbCommand(stock_seg, dbConn);
                         System.Data.OleDb.OleDbDataAdapter cn_stk2 = new System.Data.OleDb.OleDbDataAdapter(stk2);
                         DataTable stock2 = new DataTable();
                         //stk2.Transaction = tran;
-                        cn_stk2.Fill(stock2);
+                        cn_stk2.Fill(stock2);*/
 
                         string act_stock_seg = "";
                         //Validar si existe
-                        if (stock2.Rows.Count == 0)
-                        {
+                        //if (stock2.Rows.Count == 0)
+                        //{
                             // Se lanza error para que no registre a menos que haya cierre semanal.
-                            throw new System.ArgumentException("Producto " + producto + " no tiene registro semanal.", "SCACSALP");
+                            //throw new System.ArgumentException("Producto " + producto + " no tiene registro semanal.", "SCACSALP");
                             // Se toma datos de la semana anterior para crear un nuevo registro
                             /*string stock_seg_ant = "SELECT * FROM SCACSALP WHERE CSAL_ANO = '" + Hoy.ToString("yyyy") + "' And CSAL_SEMAN = '" + (weekofyear - 1).ToString().PadLeft(2).Replace(" ", "0") + "' And CSAL_ALMAC = '" + almacen + "' And CSAL_ARTIC='" + producto + "' And CSAL_CALID = '1' And CSAL_CPACK='00001'";
                             System.Data.OleDb.OleDbCommand stk2_ant = new System.Data.OleDb.OleDbCommand(stock_seg_ant, dbConn);
@@ -357,37 +525,37 @@ namespace LeerVentas
                             act_stk2.Transaction = tran;
                             act_stk2.ExecuteNonQuery();
                             InsSCACSAL = true;*/
-                        }
+                        /*}
                         else
-                        {
+                        {*/
                             // Actualizo datos del registro que se tiene 
-                            foreach (DataRow dat in stock2.Rows)
-                            {
+                            //foreach (DataRow dat in stock2.Rows)
+                            //{
                                 datscasal[0] = producto;
                                 datscasal[1] = Convert.ToString(Convert.ToInt32(venta["cant_calzado"]) + Convert.ToInt32(venta["cant_no_calzado"]));
                                 datscasal[2] = venta["col_med"].ToString();
-                                act_stock_seg = "UPDATE SCACSALP SET CSAL_STKTO=CSAL_STKTO-" + datscasal[1] + ", CSAL_SALNO = CSAL_SALNO+" + datscasal[1] + ",CSAL_MED" + venta["col_med"].ToString().PadLeft(2).Replace(" ", "0") + "=CSAL_MED" + venta["col_med"].ToString().PadLeft(2).Replace(" ", "0") + "-" + datscasal[1] + " WHERE CSAL_ANO = '" + Hoy.ToString("yyyy") + "' And CSAL_SEMAN = '" + weekofyear.ToString().PadLeft(2).Replace(" ", "0") + "' And CSAL_ALMAC = '" + almacen + "' And CSAL_ARTIC='" + producto + "' And CSAL_CALID = '"+calidad+"' And CSAL_CPACK='"+pack+"' And CSAL_EMPRE ='" + empresa + "'";
-                            }
+                                act_stock_seg = "UPDATE SCACSALP SET CSAL_STKTO=CSAL_STKTO-" + datscasal[1] + ", CSAL_SALNO = CSAL_SALNO+" + datscasal[1] + ",CSAL_MED" + venta["col_med"].ToString().PadLeft(2).Replace(" ", "0") + "=CSAL_MED" + venta["col_med"].ToString().PadLeft(2).Replace(" ", "0") + "-" + datscasal[1] + " WHERE CSAL_EMPRE ='" + empresa + "' And CSAL_ANO = '" + Convert.ToDateTime(venta["fecha_vta"]).ToString("yyyy") + "' And CSAL_SEMAN = '" + weekofyear.ToString().PadLeft(2).Replace(" ", "0") + "' And CSAL_ALMAC = '" + almacen + "' And CSAL_CALID = '" + calidad + "' And CSAL_ARTIC='" + producto + "' And CSAL_CPACK='"+pack+"'";
+                            //}
                             // Se ejecuta sentencia
                             System.Data.OleDb.OleDbCommand act_stk2 = new System.Data.OleDb.OleDbCommand(act_stock_seg, dbConn);
                             //act_stk2.Transaction = tran;
                             act_stk2.ExecuteNonQuery();
                             scasalp.Add(datscasal);
                             ActSCACSALP = true;
-                        }
-                        // Termina de Actualizar y actualiza en la BD
+                        //}
+                        // Termina de Actualizar y actualiza en la BD P = PROCESADO
                         ActualizaVentas(venta["id_venta"].ToString(), "P");
                     }
                     catch (Exception ex)
                     {
                         //tran.Rollback();
                         // RollBack Manual
-                        if (ActSCACODI)
+                        /*if (ActSCACODI)
                         {
                             string actualiza_rb = "UPDATE SCACODI SET TAB_CPAR1='" + codigo2_ant + "',TAB_CPAR2='" + codigo1_ant + "' WHERE TAB_EMPRE='"+empresa+"' And TAB_TIPO='090' And TAB_CTAB = '004'";
                             System.Data.OleDb.OleDbCommand act_rb = new System.Data.OleDb.OleDbCommand(actualiza_rb, dbConn);
                             act_rb.ExecuteNonQuery();
-                        }
+                        }*/
                         if (InsSCCCSXN)
                         {
                             string mov_cab_rb = "DELETE FROM SCCCSXN WHERE CSXN_ALMAC='"+almacen+ "' And CSXN_CODIG='"+codigo+ "'";
@@ -419,10 +587,11 @@ namespace LeerVentas
                                 act_stk2_rb.ExecuteNonQuery();
                             }
                         }
-                        // Se realiza RollBack del Estado en la BD si es necesario
-                        ActualizaVentas(venta["id_venta"].ToString(), " ");
+                        // Se realiza RollBack del Estado en la BD si es necesario "" ROLLBACK
+                        ActualizaVentas(venta["id_venta"].ToString(), "");
                         //if (InsSCACSALP) { }
-                        throw ex;
+                        ActualizaLogVentas(venta["id_venta"].ToString(), "Error en Actualización de DBF.", ex.Message);
+                        //throw ex;
                     }
                     validavta = venta["id_venta"].ToString();
                 }// fin foreach
@@ -430,12 +599,17 @@ namespace LeerVentas
                 {
                     //Se termina transacción y cerramos conexión
                     //tran.Commit();
+                    if (min_week < Convert.ToInt32(Hoy.ToString("yyyy") + Convert.ToString(myCal.GetWeekOfYear(Hoy, myCWR, myFirstDOW)).PadLeft(2).Replace(" ", "0")))
+                    {
+                        Envia_correo();
+                    }
                     dbConn.Close();
                 }
                 catch (Exception ex)
                 {
+                    ActualizaLogVentas("", "Error en Cierre de Conexión a DBF.", ex.Message);
                     //tran.Rollback();
-                    throw ex;
+                    //throw ex;
                 }
             }// fin using
         }
@@ -444,9 +618,7 @@ namespace LeerVentas
         {
             LeerVenta exe = new LeerVenta();
 
-            DataTable datos = exe.ListaVentas();
-
-            exe.ActualizaenDBF(datos);
+            exe.ActualizaenDBF();
         }
     }
 }
