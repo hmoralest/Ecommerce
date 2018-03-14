@@ -1,0 +1,8 @@
+DROP TABLE IF EXISTS `batadb`.`ps_order_tracking`;
+CREATE TABLE  `batadb`.`ps_order_tracking` (
+  `id_order` int(10) unsigned NOT NULL,
+  `reference` varchar(9) NOT NULL,
+  `tracking_code` varchar(64) NOT NULL,
+  `fecha_registro` datetime NOT NULL,
+  `estado_SP` int(10) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='tabla que almacenará los tracking que se actualicen.';

@@ -54,8 +54,8 @@ namespace ActTrackings
                 }
                 catch (Exception ex)
                 {
-                    mysql.Close();
                     ejecuto = new string[] { "0", ex.Message };
+                    mysql.Close();
                     return ejecuto;
                 } // end try
             } // end using

@@ -23,7 +23,7 @@ BEGIN
 			montodcto										As Monto
 	From Scaprom
 	Where codtda = @tienda
-	  And estado = 'A'
+	  And estado NOT IN ('D')
 	  And calidad = 1
 	  And fecfin >= GETDATE()
 	  

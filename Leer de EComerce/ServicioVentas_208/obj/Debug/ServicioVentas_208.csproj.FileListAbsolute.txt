@@ -1,0 +1,8 @@
+D:\ECommerce\Leer de EComerce\ServicioVentas_208\obj\Debug\ServicioVentas_208.csprojResolveAssemblyReference.cache
+D:\ECommerce\Leer de EComerce\ServicioVentas_208\obj\Debug\ServicioVentas_208.ProjectInstaller.resources
+D:\ECommerce\Leer de EComerce\ServicioVentas_208\obj\Debug\ServicioVentas_208.csproj.GenerateResource.Cache
+D:\ECommerce\Leer de EComerce\ServicioVentas_208\bin\Debug\ServicioVentas_208.exe.config
+D:\ECommerce\Leer de EComerce\ServicioVentas_208\bin\Debug\ServicioVentas_208.exe
+D:\ECommerce\Leer de EComerce\ServicioVentas_208\bin\Debug\ServicioVentas_208.pdb
+D:\ECommerce\Leer de EComerce\ServicioVentas_208\obj\Debug\ServicioVentas_208.exe
+D:\ECommerce\Leer de EComerce\ServicioVentas_208\obj\Debug\ServicioVentas_208.pdb

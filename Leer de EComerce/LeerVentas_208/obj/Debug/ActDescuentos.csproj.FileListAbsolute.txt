@@ -1,0 +1,10 @@
+D:\ECommerce\Actualiza EComerce\ActDescuentos\bin\Debug\ActDescuentos.exe.config
+D:\ECommerce\Actualiza EComerce\ActDescuentos\bin\Debug\ActDescuentos.exe
+D:\ECommerce\Actualiza EComerce\ActDescuentos\bin\Debug\ActDescuentos.pdb
+D:\ECommerce\Actualiza EComerce\ActDescuentos\bin\Debug\LogProcesos.dll
+D:\ECommerce\Actualiza EComerce\ActDescuentos\bin\Debug\MySql.Data.dll
+D:\ECommerce\Actualiza EComerce\ActDescuentos\bin\Debug\LogProcesos.pdb
+D:\ECommerce\Actualiza EComerce\ActDescuentos\bin\Debug\MySql.Data.xml
+D:\ECommerce\Actualiza EComerce\ActDescuentos\obj\Debug\ActDescuentos.csprojResolveAssemblyReference.cache
+D:\ECommerce\Actualiza EComerce\ActDescuentos\obj\Debug\ActDescuentos.exe
+D:\ECommerce\Actualiza EComerce\ActDescuentos\obj\Debug\ActDescuentos.pdb

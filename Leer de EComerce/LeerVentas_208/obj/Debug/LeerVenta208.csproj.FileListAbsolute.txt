@@ -1,0 +1,6 @@
+D:\ECommerce\Leer de EComerce\LeerVentas_208\bin\Debug\LeerVenta208.exe.config
+D:\ECommerce\Leer de EComerce\LeerVentas_208\bin\Debug\LeerVenta208.exe
+D:\ECommerce\Leer de EComerce\LeerVentas_208\bin\Debug\LeerVenta208.pdb
+D:\ECommerce\Leer de EComerce\LeerVentas_208\obj\Debug\LeerVenta208.csprojResolveAssemblyReference.cache
+D:\ECommerce\Leer de EComerce\LeerVentas_208\obj\Debug\LeerVenta208.exe
+D:\ECommerce\Leer de EComerce\LeerVentas_208\obj\Debug\LeerVenta208.pdb

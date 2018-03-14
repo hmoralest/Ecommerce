@@ -4,8 +4,11 @@ DELIMITER //
 
 CREATE procedure USP_ActualizaTracking(ref_order varchar(9), tracking varchar(64))
 BEGIN
-	DECLARE ierr INT DEFAULT 0;
-	declare orden		int;
+	DECLARE ierr   INT DEFAULT 0;
+	DECLARE orden  INT;
+	-- Modificado por : Henry Morales - 09/03/2018
+	-- Asunto	  : Se agrego validacion de la grabacion
+	DECLARE final  INT DEFAULT 0;
 
 	DECLARE CONTINUE HANDLER FOR SQLEXCEPTION  SET ierr = 1;
 	DECLARE CONTINUE HANDLER FOR SQLWARNING  SET ierr = 1;
@@ -25,12 +28,30 @@ BEGIN
 		Set tracking_number = tracking
 		Where id_order = orden;
 
-	IF  ierr=1 THEN
-		SELECT 0 as error;
-		ROLLBACK;
-	ELSE
-		SELECT 1 as error;
+		Select count(o.id_order)
+		From ps_orders o
+			Inner Join ps_order_carrier oc
+				On o.id_order = oc.id_order And o.id_order = orden
+		Where o.shipping_number = tracking And oc.tracking_number = tracking
+		Into final;
+		-- Fin Validación
+
+	IF  ierr=0 And final = 1 THEN
 		COMMIT;
+		SELECT 1 as error;
+		-- SELECT 1 as error, final, ierr;
+		-- Modificado por : Henry Morales - 09/03/2018
+		-- Asunto	  : Se agrego validacion de la grabacion
+		Insert into ps_order_tracking (id_order, reference, tracking_code, fecha_registro, estado_SP)
+		Values (orden, ref_order, tracking, now(),1);
+	ELSE
+		ROLLBACK;
+		SELECT 0 as error;
+		-- SELECT 0 as error, final, ierr;
+		-- Modificado por : Henry Morales - 09/03/2018
+		-- Asunto	  : Se agrego validacion de la grabacion
+		Insert into ps_order_tracking (id_order, reference, tracking_code, fecha_registro, estado_SP)
+		Values (orden, ref_order, tracking, now(),0);
 	END IF;
 
 END//

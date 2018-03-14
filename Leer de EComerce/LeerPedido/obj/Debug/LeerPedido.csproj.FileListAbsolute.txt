@@ -2,7 +2,6 @@ D:\ECommerce\Leer de EComerce\LeerPedido\bin\Debug\LeerPedido.exe.config
 D:\ECommerce\Leer de EComerce\LeerPedido\obj\Debug\LeerPedido.csprojResolveAssemblyReference.cache
 D:\ECommerce\Leer de EComerce\LeerPedido\bin\Debug\LeerPedido.exe
 D:\ECommerce\Leer de EComerce\LeerPedido\bin\Debug\LeerPedido.pdb
-D:\ECommerce\Leer de EComerce\LeerPedido\bin\Debug\Bukimedia.PrestaSharp.dll
 D:\ECommerce\Leer de EComerce\LeerPedido\bin\Debug\Servicios.dll
 D:\ECommerce\Leer de EComerce\LeerPedido\bin\Debug\RestSharp.dll
 D:\ECommerce\Leer de EComerce\LeerPedido\bin\Debug\Servicios.pdb
@@ -11,3 +10,4 @@ D:\ECommerce\Leer de EComerce\LeerPedido\obj\Debug\LeerPedido.exe
 D:\ECommerce\Leer de EComerce\LeerPedido\obj\Debug\LeerPedido.pdb
 D:\ECommerce\Leer de EComerce\LeerPedido\bin\Debug\MySql.Data.dll
 D:\ECommerce\Leer de EComerce\LeerPedido\bin\Debug\MySql.Data.xml
+D:\ECommerce\Leer de EComerce\LeerPedido\bin\Debug\Bukimedia.PrestaSharp.dll

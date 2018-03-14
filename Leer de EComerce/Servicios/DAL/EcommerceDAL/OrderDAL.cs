@@ -70,7 +70,7 @@ namespace Servicios.DAL.EcommerceDAL
             {
                 todos = orderPaymentFactory.GetAll();
                 
-                todos.Select(x => (x.order_reference)).ToList();
+                var email = todos.Select(x => (x.order_reference)).ToList();
 
                 foreach (order_payment uno in todos)
                 {

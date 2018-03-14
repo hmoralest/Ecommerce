@@ -57,13 +57,13 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="PrepararPedidos\" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Servicios\WebServices.csproj">
       <Project>{99d40ee0-4ed8-45b6-a7c6-c253066b5a8c}</Project>
       <Name>WebServices</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="PrepararPedidos\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -49,5 +49,6 @@ BEGIN
 			On vta.Ven_Id = det.Ven_Det_Id
 	Where vta.Ven_Alm_Id = @tienda
 	  And isnull(vta.Ven_EstAct_Alm,'') NOT IN ('P')
+	  And isnull(vta.Ven_Est_Id,'') <> 'FANUL';
 
 END

@@ -1,0 +1,16 @@
+D:\ECommerce\Servicio\ServicioWindows\ServicioWindows\bin\Debug\ServicioWindows.exe.config
+D:\ECommerce\Servicio\ServicioWindows\ServicioWindows\bin\Debug\ServicioWindows.exe
+D:\ECommerce\Servicio\ServicioWindows\ServicioWindows\bin\Debug\ServicioWindows.pdb
+D:\ECommerce\Servicio\ServicioWindows\ServicioWindows\obj\Debug\ServicioWindows.csprojResolveAssemblyReference.cache
+D:\ECommerce\Servicio\ServicioWindows\ServicioWindows\obj\Debug\ServicioWindows.ProjectInstaller.resources
+D:\ECommerce\Servicio\ServicioWindows\ServicioWindows\obj\Debug\ServicioWindows.csproj.GenerateResource.Cache
+D:\ECommerce\Servicio\ServicioWindows\ServicioWindows\obj\Debug\ServicioWindows.exe
+D:\ECommerce\Servicio\ServicioWindows\ServicioWindows\obj\Debug\ServicioWindows.pdb
+D:\ECommerce\Leer de EComerce\ServicioWindows\bin\Debug\ServicioWindows.exe.config
+D:\ECommerce\Leer de EComerce\ServicioWindows\bin\Debug\ServicioWindows.exe
+D:\ECommerce\Leer de EComerce\ServicioWindows\bin\Debug\ServicioWindows.pdb
+D:\ECommerce\Leer de EComerce\ServicioWindows\obj\Debug\ServicioWindows.ProjectInstaller.resources
+D:\ECommerce\Leer de EComerce\ServicioWindows\obj\Debug\ServicioWindows.csproj.GenerateResource.Cache
+D:\ECommerce\Leer de EComerce\ServicioWindows\obj\Debug\ServicioWindows.exe
+D:\ECommerce\Leer de EComerce\ServicioWindows\obj\Debug\ServicioWindows.pdb
+D:\ECommerce\Leer de EComerce\ServicioWindows\obj\Debug\ServicioWindows.csprojResolveAssemblyReference.cache

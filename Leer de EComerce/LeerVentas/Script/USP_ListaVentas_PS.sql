@@ -69,6 +69,7 @@ BEGIN
 			On art.Art_SubCat_Id = scat.Sca_Id
 	Where vta.Ven_Alm_Id = @tienda
 	  And isnull(vta.Ven_EstAct_Alm,'') NOT IN ('P','E')
+	  And isnull(vta.Ven_Est_Id,'') <> 'FANUL';
 
 END
 
