@@ -24,8 +24,11 @@ namespace ActDescuentos
 
         string proceso = "ActDescuentos";
         string archivo = "";
-        string tienda = "e-com";
+        string tienda = "50005";
         public static StreamWriter sw;
+
+        private static bool escribe_archivo = true;
+        private static bool escribe_log = true;
 
         public DataTable ListaDescuentos(string tienda)
         {
@@ -64,14 +67,22 @@ namespace ActDescuentos
 
         public void ActualizaDescuentos(DataTable descuentos)
         {
-            if (log.ValidaProceso(proceso) != 1)
+            int valida = 0;
+            if (escribe_log)
+            {
+                log.ValidaProceso(proceso);
+            }
+            if (valida != 1)
             {
                 //datos generales
                 int estado = 1;
                 mysql = oConexionMySql.getConexionMySQL();
                 mysql.Open();
                 //Actualiza estado a proceso abierto
-                log.ActualizaLogProceso(proceso, -1);
+                if (escribe_log)
+                {
+                    log.ActualizaLogProceso(proceso, -1);
+                }
 
                 /*//datos para archivo LOG
                 int contador = 1;
@@ -102,11 +113,14 @@ namespace ActDescuentos
                 }
                 catch (Exception ex)
                 {
-                    sw.WriteLine(ex.Message);
                     estado = 0;
-                    log.ActualizaLogProceso(proceso, estado);
-                    sw.WriteLine("Error en lectura de productos en Prestashop.");
-                    sw.WriteLine("************ Fin Proceso:  " + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + "");
+                    if (escribe_log) { log.ActualizaLogProceso(proceso, estado); }
+                    if (escribe_archivo)
+                    {
+                        sw.WriteLine(ex.Message);
+                        sw.WriteLine("Error en lectura de productos en Prestashop.");
+                        sw.WriteLine("************ Fin Proceso:  " + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + "");
+                    }
                     return;
                 }
 
@@ -146,11 +160,14 @@ namespace ActDescuentos
                 }
                 catch (Exception ex)
                 {
-                    sw.WriteLine(ex.Message);
                     estado = 0;
-                    log.ActualizaLogProceso(proceso, estado);
-                    sw.WriteLine("Error en limpiar tabla de descuentos en Prestashop.");
-                    sw.WriteLine("************ Fin Proceso:  " + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + "");
+                    if (escribe_log) { log.ActualizaLogProceso(proceso, estado); }
+                    if (escribe_archivo)
+                    {
+                        sw.WriteLine(ex.Message);
+                        sw.WriteLine("Error en limpiar tabla de descuentos en Prestashop.");
+                        sw.WriteLine("************ Fin Proceso:  " + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + "");
+                    }
                     return;
                 }
 
@@ -163,8 +180,8 @@ namespace ActDescuentos
                     //Actualizar en Prestashop
                     MySqlCommand comm = mysql.CreateCommand();
                     cadena =            "Insert into ps_specific_price ";
-                    cadena = cadena +   "Select " + cant_reg.ToString() + ",0,0,id_product,1,0,0,0,0,0,0,-1,1," + row["Monto"] + ",1,'amount','" + row["Fecha_Ini"] + "','" + row["Fecha_Fin"] + "' ";
-                    cadena = cadena +   "From ps_product Where replace(reference,'-', '') = '" + row["product_id"] + "'";
+                    cadena = cadena +   "Select " + cant_reg.ToString() + ",0,0,id_product,1,0,0,0,0,0,0,-1,1," + row["Monto"].ToString() + ",1,'amount','" + row["Fecha_Ini"].ToString() + "','" + row["Fecha_Fin"].ToString() + "' ";
+                    cadena = cadena +   "From ps_product Where replace(reference,'-', '') = '" + row["product_id"].ToString() + "'";
                     comm.CommandText = cadena;
                     try
                     {
@@ -173,14 +190,17 @@ namespace ActDescuentos
                     }
                     catch(Exception ex)
                     {
-                        sw.WriteLine(ex.Message);
                         estado = 0;
-                        log.ActualizaLogProceso(proceso, estado);
-                        sw.WriteLine("Error en ingresar descuentos de producto " + row["product_id"] + " y descuento " + row["Monto"] + " en Prestashop.");
+                        if (escribe_log) { log.ActualizaLogProceso(proceso, estado); }
+                        if (escribe_archivo)
+                        {
+                            sw.WriteLine(ex.Message);
+                            sw.WriteLine("Error en ingresar descuentos de producto " + row["product_id"].ToString() + " y descuento " + row["Monto"].ToString() + " en Prestashop.");
+                        }
                     }
                 }
                 string termino_proceso;
-                log.ActualizaLogProceso(proceso, estado);
+                if (escribe_log) { log.ActualizaLogProceso(proceso, estado); }
                 if (estado == 1)
                 {
                     termino_proceso = "correctamente.";
@@ -189,28 +209,56 @@ namespace ActDescuentos
                 {
                     termino_proceso = "con errores.";
                 }
-                sw.WriteLine("Se actualizaron " + cant_reg.ToString() + " registros.");
-                sw.WriteLine("El proceso terminó " + termino_proceso);
+                if (escribe_archivo)
+                {
+                    sw.WriteLine("Se actualizaron " + cant_reg.ToString() + " registros.");
+                    sw.WriteLine("El proceso terminó " + termino_proceso);
+                }
 
             }
             else
             {
-                sw.WriteLine("El proceso se aborto por el flag de control.");
+                if (escribe_archivo)
+                {
+                    sw.WriteLine("El proceso se aborto por el flag de control.");
+                }
             }
-            sw.WriteLine("************ Fin Proceso:  " + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + "");
+            if (escribe_archivo)
+            {
+                sw.WriteLine("************ Fin Proceso:  " + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + "");
+            }
         }
 
         public static void Main(string[] args)
         {
             ActDescuento exe = new ActDescuento();
 
-            exe.CrearArchivoLog();
-            sw.WriteLine("************ Inicio Proceso:  " + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + "");
-
+            // Creación de Archivo
+            try
+            {
+                exe.CrearArchivoLog();
+                sw.WriteLine("************ Inicio Proceso:  " + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + "");
+            }
+            catch
+            {
+                escribe_archivo = false;
+            }
+            // Creación de Log SQL
             try
             {
                 exe.log.CreaLogProceso(exe.proceso);
-
+            }
+            catch (Exception ex)
+            {
+                escribe_log = false;
+                if (escribe_archivo)
+                {
+                sw.WriteLine("Error en Creación de Flag de Procesos en SQL.");
+                    sw.WriteLine(ex.Message);
+                }
+            }
+            try
+            {
                 DataTable tabla = new DataTable();
 
                 tabla = exe.ListaDescuentos(exe.tienda);
@@ -220,9 +268,12 @@ namespace ActDescuentos
             }
             catch (Exception ex)
             {
-                exe.log.ActualizaLogProceso(exe.proceso, -1);
-                sw.WriteLine(ex.Message);
-                sw.Close();
+                if (escribe_log) { exe.log.ActualizaLogProceso(exe.proceso, -1);  }
+                if (escribe_archivo)
+                {
+                    sw.WriteLine(ex.Message);
+                    sw.Close();
+                }
             }
         }
 

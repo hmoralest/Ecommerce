@@ -19,7 +19,7 @@ BEGIN
 			@almacen	Varchar(4);
 
 	Set	@entidad = '50005'
-	Set	@almacen = '0000'
+	Set	@almacen = 'I'
 	
 	Select top 1000
 			@entidad As entidad,
@@ -48,7 +48,6 @@ BEGIN
 			@almacen	As almacen,
 			'01' As moneda,
 			'1' As tipo_cambio,
-			'1' As form_pag,
 			'usu'	As usu_vta,
 			'vend' As vendedor,
 			vta.Ven_Cod_Hash	As codigo,
@@ -62,8 +61,8 @@ BEGIN
 			det.Ven_Det_Precio	As prec_artic,
 			det.Ven_Det_ComisionM As dcto_artic_tot, -- dcto
 			doc_pag.Doc_Tra_ConId	As forma_pago,	/*Falta equivalencia en Forma de Pago*************************/
-			CASE WHEN (LTRIM(RTRIM(ISNULL(doc_pag.Doc_Bin_NumTar,''))))= '' THEN doc_pag.trans2
-				ELSE LTRIM(RTRIM(ISNULL(doc_pag.Doc_Bin_NumTar,'')))
+			CASE WHEN (LTRIM(RTRIM(ISNULL(doc_pag.tarj,''))))= '' THEN doc_pag.trans2
+				ELSE LTRIM(RTRIM(ISNULL(doc_pag.tarj,'')))
 				END		As doc_pago,
 			doc_pag.Doc_Tra_SubTotal	As total_pago, 
 			Replace(Convert(Varchar,doc_pag.Doc_Tra_Fecha,102),'.','')	As fec_pago,
@@ -74,10 +73,12 @@ BEGIN
 		Inner Join Basico_Dato cli
 			On Ven_BasId = cli.Bas_Id
 		Inner Join (Select	d1.Doc_Tra_Doc, d2.Doc_Tra_ConId, d2.Doc_Tra_SubTotal, d2.Doc_Tra_Fecha,
-							d1.Doc_Tra_GruId, d2.Doc_Tra_Doc As trans2, d2.Doc_Bin_NumTar
+							d1.Doc_Tra_GruId, pag.Pag_Num_Consignacion As trans2, pag.Pag_Num_Tarjeta As tarj
 					From Documento_Transaccion d1
 					Inner Join Documento_Transaccion  d2
 						On d1.Doc_Tra_GruId = d2.Doc_Tra_GruId
+					Inner Join Pago pag
+						On d2.Doc_Tra_Doc = pag.Pag_Id
 					Where d1.Doc_Tra_Doc <> d2.Doc_Tra_Doc) doc_pag
 			On vta.Ven_Id = doc_pag.Doc_Tra_Doc
 	Where 1=1

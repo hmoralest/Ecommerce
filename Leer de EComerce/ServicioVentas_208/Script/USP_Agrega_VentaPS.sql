@@ -15,12 +15,17 @@ CREATE Procedure USP_Agrega_VentaPS(
 	@validavta			Varchar(max),
 	@entidad			Varchar(max),
 
+	@tipo				Varchar(2),
+
 	@tipo_doc			Varchar(2),
 	@tipo_doc_sunat		Varchar(2),
 	@serie_doc			Varchar(4),
 	@numero_doc			Varchar(8),
 	@ven_fecha			Varchar(max),
 	@ven_hora			Varchar(max),
+	@cod_ref			Varchar(max),
+	@ser_ref			Varchar(max),
+	@num_ref			Varchar(max),
 	@pri_nom_cli		Varchar(max),
 	@seg_nom_cli		Varchar(max),
 	@pri_ape_cli		Varchar(max),
@@ -75,20 +80,23 @@ BEGIN
 		/************************************************************/
 		/*******AGREGA CABECERA FACTURA******************************/
 		/************************************************************/
-		Insert Into Ffactc_ecom (	FC_NINT,	COD_ENTID,	FC_NNOT,	FC_CODI,	FC_SUNA,	FC_SFAC,	FC_NFAC,	FC_FFAC,	FC_NCLI,	FC_NOMB,	FC_APEP,
+		Insert Into Ffactc_ecom (	FC_NINT,	COD_ENTID,	FC_NNOT,	FC_CODI,	FC_SUNA,	FC_SFAC,	FC_NFAC,	FC_FFAC,	FC_CREF,	FC_SREF,	FC_NREF,	FC_NCLI,	FC_NOMB,	FC_APEP,
 									FC_APEM,	FC_DCLI,	FC_RUC,		FC_VUSE,	FC_VEND,	FC_PINT,	FC_NCON,	FC_LCON,	FC_LRUC,	FC_AGEN,	FC_MONE,	FC_TASA,
 									FC_FPAG,	FC_NLET,	FC_QTOT,	FC_PREF,	FC_DREF,	FC_BRUT,	FC_VIMP1,	FC_VIMP2,	FC_VDCT1,	FC_VDCT4,	FC_PDC2,	FC_PDC3,
 									FC_VDC23,	FC_VVTA,	FC_VIMP3,	FC_PIMP4,	FC_VIMP4,	FC_TOTAL,	FC_CUSE,	FC_MUSE,	FC_FCRE,	FC_HORA,	FEC_SERVER) 
-		Values (@codigo_fact, @entidad, @codigo_nota, @tipo_doc, @tipo_doc_sunat, @serie_doc, @numero_doc, @ven_fecha, @pri_nom_cli+' '+@seg_nom_cli+' '+@pri_ape_cli+' '+@seg_ape_cli,
+		Values (@codigo_fact, @entidad, @codigo_nota, @tipo_doc, @tipo_doc_sunat, @serie_doc, @numero_doc, @ven_fecha, @cod_ref, @ser_ref, @num_ref, @pri_nom_cli+' '+@seg_nom_cli+' '+@pri_ape_cli+' '+@seg_ape_cli,
 				@pri_nom_cli+ ' '+@seg_nom_cli, @pri_ape_cli, @seg_ape_cli, @dir_cli, @ruc_cli, @usu_crea, @cod_vend, 0, @codigo, @telf_cli, @ruc_cli, @doc_pago, @moneda, @tipo_camb, @forma_pago,
 				0, @tot_cant, @precio_cigv, @tot_dcto_sigv, @tot_precio_sigv, 0, 0, @tot_dcto_sigv, 0, 0, 0, 0, @total_sigv, @tot_igv, 0, 0, @total_venta, 'www', @usu_crea, @ven_fecha, @ven_hora, GETDATE());
-		
+	
 		
 		/************************************************************/
 		/*******AGREGA PAGO FACTURA**********************************/
 		/************************************************************/
-		Insert Into Fnotaa_ecom(	NA_NOTA,	COD_ENTID,	NA_ITEM,	NA_MONE,	NA_TPAG,	NA_TASA,	NA_NREF,	NA_VREF,	NA_VPAG,	NA_CIER,	NA_FCRE)
-		Values (@codigo_nota, @entidad, '001', @moneda, @forma_pago, @tipo_camb, @doc_pago, @total_venta, @total_venta, 'C', @ven_fecha+' '+@ven_hora+ ' VEN');
+		IF (@tipo = 'VT')
+		BEGIN
+			Insert Into Fnotaa_ecom(	NA_NOTA,	COD_ENTID,	NA_ITEM,	NA_MONE,	NA_TPAG,	NA_TASA,	NA_NREF,	NA_VREF,	NA_VPAG,	NA_CIER,	NA_FCRE)
+			Values (@codigo_nota, @entidad, '001', @moneda, @forma_pago, @tipo_camb, @doc_pago, @total_venta, @total_venta, 'C', @ven_fecha+' '+@ven_hora+ ' VEN');
+		END
 		
 		
 		/************************************************************/
@@ -139,7 +147,7 @@ BEGIN
 			Set @total_artic_cigv = round(@precio_tot_sigv*1.18,1);
 
 
-
+			
 			Insert Into Ffactd_ecom (	FD_NINT,	COD_ENTID,	FD_TIPO,	FD_ARTI,	ID_CALIDAD,	FD_REGL,	FD_COLO,	FD_ITEM,	FD_QFAC,	FD_LPRE,	FD_CALM,
 										FD_PREF,	FD_DREF,	FD_PREC,	FD_BRUT,	FD_PIMP1,	FD_VIMP1,	FD_SUBT1,	FD_PIMP2,	FD_VIMP2,	FD_SUBT2,	FD_PDCT1,	FD_VDCT1,
 										FD_SUBT3,	FD_VDCT4,	FD_VDC23,	FD_VVTA,	FD_PIMP3,	FD_VIMP3,	FD_PIMP4,	FD_VIMP4,	FD_TOTAL,	FD_CUSE,	FD_MUSE,	FD_FCRE,

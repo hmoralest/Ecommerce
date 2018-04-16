@@ -237,9 +237,9 @@ namespace ActStocks
                 mysql.Close();
                 return "Error: " + error + " // " + ex.Message;
             }
+            ControlaTrans(1);
             sql.Close();
             mysql.Close();
-            ControlaTrans(1);
             return "";
         }
 

@@ -24,8 +24,9 @@ namespace ServicioWindows
         public static string proceso_log = "ActStock_DBF";
 
         static string calidad = "1"; //DBF (producto) OK
-        static string almacen = "5"; //DBF (stock producto)
-        static string concepto = "98"; //DBF (movimiento) OK
+        static string almacen = "I"; //DBF (stock producto) OK
+        static string concepto_vt = "98"; //DBF (movimiento_venta) OK
+        static string concepto_nc = "98"; //DBF (movimiento_notacred) OK
         static string client = "00000"; //DBF (movimiento - cliente generico)
         static string empresa = "02"; //DBF (stock producto) ok
         static string canal = "5"; //DBF (stock producto) OK
@@ -82,7 +83,7 @@ namespace ServicioWindows
             return result;
         }
 
-        private static void ActualizaVentas(string id_venta, string estado)
+        private static void ActualizaVentas(string id_venta, string estado, string tipo)
         {
 
             using (SqlConnection sql = oConexion.getConexionSQL())
@@ -98,6 +99,7 @@ namespace ServicioWindows
 
                     cmd.Parameters.Add("@id", SqlDbType.VarChar).Value = id_venta;
                     cmd.Parameters.Add("@estado", SqlDbType.VarChar).Value = estado;
+                    cmd.Parameters.Add("@tipo", SqlDbType.VarChar).Value = tipo;        // NC: Nota de Credito; VT: Ventas
 
                     cmd.ExecuteNonQuery();
 
@@ -211,8 +213,8 @@ namespace ServicioWindows
 
                         if (stock1.Rows.Count == 0 || stock2.Rows.Count == 0)
                         {
-                            ActualizaVentas(row["id"].ToString(), "E");
-                            ActualizaLogVentas(row["id"].ToString(), "Producto " + row["producto"].ToString() + " no tiene registro semanal.", "Tablas SCACSAL y SCACSALP", proceso_log);
+                            ActualizaVentas(row["id"].ToString(), "E", row["tipo"].ToString());
+                            ActualizaLogVentas(row["id"].ToString(), row["tipo"].ToString() + " - Producto " + row["producto"].ToString() + " no tiene registro semanal.", "Tablas SCACSAL y SCACSALP", proceso_log);
                         }
                     }
                     catch (Exception ex)
@@ -309,6 +311,16 @@ namespace ServicioWindows
 
                         if (validavta != venta["id_venta"].ToString())
                         {
+                            // Se da valor al concepto que se usará en la transaccion
+                            string concepto = "";
+                            if (venta["tipo"].ToString() == "VT")
+                            {
+                                concepto = concepto_vt;
+                            }
+                            if (venta["tipo"].ToString() == "NC")
+                            {
+                                concepto = concepto_nc;
+                            }
                             // Se Setean en False (Nueva Venta)
                             ActSCACODI = false;
                             InsSCCCSXN = false;
@@ -325,7 +337,16 @@ namespace ServicioWindows
                             //-------------------------------------
                             // Obtengo código
                             //-------------------------------------
-                            string consulta = "SELECT TAB_CPAR2,TAB_CPAR1 FROM SCACODI WHERE TAB_EMPRE='02' And TAB_TIPO='090' And TAB_CTAB = '004'";
+                            string condicion = "";
+                            if (venta["tipo"].ToString() == "VT")
+                            {
+                                condicion = " And TAB_TIPO='090' And TAB_CTAB = '004'";
+                            }
+                            if (venta["tipo"].ToString() == "NC")
+                            {
+                                condicion = " And TAB_TIPO='090' And TAB_CTAB = '004'";
+                            }
+                            string consulta = "SELECT TAB_CPAR2,TAB_CPAR1 FROM SCACODI WHERE TAB_EMPRE='" + empresa + "' "+condicion;
                             System.Data.OleDb.OleDbCommand con = new System.Data.OleDb.OleDbCommand(consulta, dbConn);
                             System.Data.OleDb.OleDbDataAdapter cona = new System.Data.OleDb.OleDbDataAdapter(con);
                             DataTable dt = new DataTable();
@@ -351,7 +372,7 @@ namespace ServicioWindows
                             //-------------------------------------
                             // Actualizo datos
                             //-------------------------------------
-                            string actualiza = "UPDATE SCACODI SET TAB_CPAR1='" + codigo2 + "',TAB_CPAR2='" + codigo1 + "'  WHERE TAB_EMPRE='"+empresa+"' And TAB_TIPO='090' And TAB_CTAB = '004'";
+                            string actualiza = "UPDATE SCACODI SET TAB_CPAR1='" + codigo2 + "',TAB_CPAR2='" + codigo1 + "'  WHERE TAB_EMPRE='"+empresa+"' "+ condicion;
                             System.Data.OleDb.OleDbCommand act = new System.Data.OleDb.OleDbCommand(actualiza, dbConn);
                             act.ExecuteNonQuery();
                             ActSCACODI = true;
@@ -423,18 +444,29 @@ namespace ServicioWindows
                         System.Data.OleDb.OleDbCommand mov2 = new System.Data.OleDb.OleDbCommand(mov_det, dbConn);
                         mov2.ExecuteNonQuery();
                         InsSCDRSXN = true;
-                        
+
 
                         //**-- STOCK
                         //-------------------------------------
                         // Busco datos del producto en tabla 1
                         //-------------------------------------
-
+                        string signo1 = "";
+                        string signo2 = "";
+                        if (venta["tipo"].ToString() == "VT")
+                        {
+                            signo1 = "-";       // resta stock
+                            signo2 = "+";       // aumenta ventas
+                        }
+                        if (venta["tipo"].ToString() == "NC")
+                        {
+                            signo1 = "+";       // aumenta stock
+                            signo2 = "-";       // resta ventas
+                        }
                         string act_stock_pri="";
                                 datscasal[0] = producto;
                                 datscasal[1] = Convert.ToString(Convert.ToInt32(venta["cant_calzado"]) + Convert.ToInt32(venta["cant_no_calzado"]));
                                 datscasal[2] = venta["col_med"].ToString();
-                                act_stock_pri = "UPDATE SCACSAL SET CSAL_STKTO=CSAL_STKTO-" + datscasal[1] + ", CSAL_SALNO = CSAL_SALNO+" + datscasal[1] + ",CSAL_MED"+ venta["col_med"].ToString().PadLeft(2).Replace(" ", "0")+ "=CSAL_MED" + venta["col_med"].ToString().PadLeft(2).Replace(" ", "0") + "-" + datscasal[1] + " WHERE CSAL_EMPRE ='" + empresa + "' And CSAL_ANO = '" + Convert.ToDateTime(venta["fecha_vta"]).ToString("yyyy") + "' And CSAL_SEMAN = '" + weekofyear.ToString().PadLeft(2).Replace(" ", "0") + "' And CSAL_ALMAC = '" + almacen + "' And CSAL_CALID = '" + calidad + "' And CSAL_ARTIC='" + producto + "'";
+                                act_stock_pri = "UPDATE SCACSAL SET CSAL_STKTO=CSAL_STKTO" + signo1 + datscasal[1] + ", CSAL_SALNO = CSAL_SALNO" + signo2 + datscasal[1] + ",CSAL_MED" + venta["col_med"].ToString().PadLeft(2).Replace(" ", "0") + "=CSAL_MED" + venta["col_med"].ToString().PadLeft(2).Replace(" ", "0") + signo1 + datscasal[1] + " WHERE CSAL_EMPRE ='" + empresa + "' And CSAL_ANO = '" + Convert.ToDateTime(venta["fecha_vta"]).ToString("yyyy") + "' And CSAL_SEMAN = '" + weekofyear.ToString().PadLeft(2).Replace(" ", "0") + "' And CSAL_ALMAC = '" + almacen + "' And CSAL_CALID = '" + calidad + "' And CSAL_ARTIC='" + producto + "'";
                            // Se ejecuta sentencia
                             System.Data.OleDb.OleDbCommand act_stk1 = new System.Data.OleDb.OleDbCommand(act_stock_pri, dbConn);
                             act_stk1.ExecuteNonQuery();
@@ -446,16 +478,30 @@ namespace ServicioWindows
                                 datscasal[0] = producto;
                                 datscasal[1] = Convert.ToString(Convert.ToInt32(venta["cant_calzado"]) + Convert.ToInt32(venta["cant_no_calzado"]));
                                 datscasal[2] = venta["col_med"].ToString();
-                                act_stock_seg = "UPDATE SCACSALP SET CSAL_STKTO=CSAL_STKTO-" + datscasal[1] + ", CSAL_SALNO = CSAL_SALNO+" + datscasal[1] + ",CSAL_MED" + venta["col_med"].ToString().PadLeft(2).Replace(" ", "0") + "=CSAL_MED" + venta["col_med"].ToString().PadLeft(2).Replace(" ", "0") + "-" + datscasal[1] + " WHERE CSAL_EMPRE ='" + empresa + "' And CSAL_ANO = '" + Convert.ToDateTime(venta["fecha_vta"]).ToString("yyyy") + "' And CSAL_SEMAN = '" + weekofyear.ToString().PadLeft(2).Replace(" ", "0") + "' And CSAL_ALMAC = '" + almacen + "' And CSAL_CALID = '" + calidad + "' And CSAL_ARTIC='" + producto + "' And CSAL_CPACK='"+pack+"'";                            // Se ejecuta sentencia
+                                act_stock_seg = "UPDATE SCACSALP SET CSAL_STKTO=CSAL_STKTO" + signo1 + datscasal[1] + ", CSAL_SALNO = CSAL_SALNO" + signo2 + datscasal[1] + ",CSAL_MED" + venta["col_med"].ToString().PadLeft(2).Replace(" ", "0") + "=CSAL_MED" + venta["col_med"].ToString().PadLeft(2).Replace(" ", "0") + signo1 + datscasal[1] + " WHERE CSAL_EMPRE ='" + empresa + "' And CSAL_ANO = '" + Convert.ToDateTime(venta["fecha_vta"]).ToString("yyyy") + "' And CSAL_SEMAN = '" + weekofyear.ToString().PadLeft(2).Replace(" ", "0") + "' And CSAL_ALMAC = '" + almacen + "' And CSAL_CALID = '" + calidad + "' And CSAL_ARTIC='" + producto + "' And CSAL_CPACK='" + pack + "'";
+                        // Se ejecuta sentencia
                             System.Data.OleDb.OleDbCommand act_stk2 = new System.Data.OleDb.OleDbCommand(act_stock_seg, dbConn);
                             act_stk2.ExecuteNonQuery();
                             scasalp.Add(datscasal);
                             ActSCACSALP = true;
                         // Termina de Actualizar y actualiza en la BD P = PROCESADO
-                        ActualizaVentas(venta["id_venta"].ToString(), "P");
+                        ActualizaVentas(venta["id_venta"].ToString(), "P", venta["tipo"].ToString());
                     }
                     catch (Exception ex)
                     {
+                        // Signo para hacer rollback, deben ser inversos
+                        string signo1 = "";
+                        string signo2 = "";
+                        if (venta["tipo"].ToString() == "VT")
+                        {
+                            signo1 = "+";       // resta stock
+                            signo2 = "-";       // aumenta ventas
+                        }
+                        if (venta["tipo"].ToString() == "NC")
+                        {
+                            signo1 = "-";       // aumenta stock
+                            signo2 = "+";       // resta ventas
+                        }
                         // RollBack Manual
                         /*if (ActSCACODI)
                         {
@@ -479,7 +525,7 @@ namespace ServicioWindows
                         {
                             foreach (string[] dat_rb in scasal)
                             {
-                                string act_stock_pri_rb = "UPDATE SCACSAL SET CSAL_STKTO=CSAL_STKTO+" + dat_rb[1].ToString() + ", CSAL_SALNO=CSAL_SALNO-" + dat_rb[1].ToString() + ", CSAL_MED" + dat_rb[2].ToString().PadLeft(2).Replace(" ", "0") + "=CSAL_MED" + dat_rb[2].ToString().PadLeft(2).Replace(" ", "0") + "-"+ dat_rb[1].ToString() + " WHERE CSAL_ANO = '" + Hoy.ToString("yyyy") + "' And CSAL_SEMAN = '" + weekofyear.ToString().PadLeft(2).Replace(" ", "0") + "' And CSAL_ALMAC = '" + almacen + "' And CSAL_ARTIC='" + dat_rb[0].ToString() + "' And CSAL_CALID = '" + calidad+ "' And CSAL_EMPRE ='" + empresa + "'";
+                                string act_stock_pri_rb = "UPDATE SCACSAL SET CSAL_STKTO=CSAL_STKTO" + signo1 + dat_rb[1].ToString() + ", CSAL_SALNO=CSAL_SALNO" + signo2 + dat_rb[1].ToString() + ", CSAL_MED" + dat_rb[2].ToString().PadLeft(2).Replace(" ", "0") + "=CSAL_MED" + dat_rb[2].ToString().PadLeft(2).Replace(" ", "0") + signo2 + dat_rb[1].ToString() + " WHERE CSAL_ANO = '" + Hoy.ToString("yyyy") + "' And CSAL_SEMAN = '" + weekofyear.ToString().PadLeft(2).Replace(" ", "0") + "' And CSAL_ALMAC = '" + almacen + "' And CSAL_ARTIC='" + dat_rb[0].ToString() + "' And CSAL_CALID = '" + calidad + "' And CSAL_EMPRE ='" + empresa + "'";
                                 System.Data.OleDb.OleDbCommand act_stk1_rb = new System.Data.OleDb.OleDbCommand(act_stock_pri_rb, dbConn);
                                 act_stk1_rb.ExecuteNonQuery();
                             }
@@ -488,14 +534,14 @@ namespace ServicioWindows
                         {
                             foreach (string[] dat_rb in scasalp)
                             {
-                                string act_stock_seg_rb = "UPDATE SCACSAL SET CSAL_STKTO=CSAL_STKTO+" + dat_rb[1].ToString() + ", CSAL_SALNO=CSAL_SALNO-" + dat_rb[1].ToString() + ", CSAL_MED" + dat_rb[2].ToString().PadLeft(2).Replace(" ", "0") + "=CSAL_MED" + dat_rb[2].ToString().PadLeft(2).Replace(" ", "0") + "-" + dat_rb[1].ToString() + " WHERE CSAL_ANO = '" + Hoy.ToString("yyyy") + "' And CSAL_SEMAN = '" + weekofyear.ToString().PadLeft(2).Replace(" ", "0") + "' And CSAL_ALMAC = '" + almacen + "' And CSAL_ARTIC='" + dat_rb[0].ToString() + "' And CSAL_CALID = '" + calidad+ "' And CSAL_EMPRE ='" + empresa + "' And CSAL_CPACK='" + pack + "'";
+                                string act_stock_seg_rb = "UPDATE SCACSAL SET CSAL_STKTO=CSAL_STKTO" + signo1 + dat_rb[1].ToString() + ", CSAL_SALNO=CSAL_SALNO" + signo2 + dat_rb[1].ToString() + ", CSAL_MED" + dat_rb[2].ToString().PadLeft(2).Replace(" ", "0") + "=CSAL_MED" + dat_rb[2].ToString().PadLeft(2).Replace(" ", "0") + signo2 + dat_rb[1].ToString() + " WHERE CSAL_ANO = '" + Hoy.ToString("yyyy") + "' And CSAL_SEMAN = '" + weekofyear.ToString().PadLeft(2).Replace(" ", "0") + "' And CSAL_ALMAC = '" + almacen + "' And CSAL_ARTIC='" + dat_rb[0].ToString() + "' And CSAL_CALID = '" + calidad + "' And CSAL_EMPRE ='" + empresa + "' And CSAL_CPACK='" + pack + "'";
                                 System.Data.OleDb.OleDbCommand act_stk2_rb = new System.Data.OleDb.OleDbCommand(act_stock_seg_rb, dbConn);
                                 act_stk2_rb.ExecuteNonQuery();
                             }
                         }
                         // Se realiza RollBack del Estado en la BD si es necesario "" ROLLBACK
-                        ActualizaVentas(venta["id_venta"].ToString(), "");
-                        ActualizaLogVentas(venta["id_venta"].ToString(), "Error en Actualización de DBF.", ex.Message, proceso_log);
+                        ActualizaVentas(venta["id_venta"].ToString(), "", venta["tipo"].ToString());
+                        ActualizaLogVentas(venta["id_venta"].ToString(), venta["tipo"].ToString() + " - Error en Actualización de DBF.", ex.Message, proceso_log);
                     }
                     validavta = venta["id_venta"].ToString();
                 }// fin foreach

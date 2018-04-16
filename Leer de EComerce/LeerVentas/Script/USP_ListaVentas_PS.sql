@@ -33,7 +33,7 @@ BEGIN
 			END										As tpdoc,
 			vta.Ven_Id									As nro_doc,
 			'PED'										As tp_ped,
-			'SQE1E21'									As cod_ped,
+			vta.Ven_Pst_Ref								As cod_ped,
 			Convert(varchar,vta.Ven_Fecha,103)			As fecha_vta,
 			replace(substring(convert(varchar,vta.Ven_Fecha,108),1,5),':','')			As hora_vta,
 			convert(varchar,getdate(),103)			As fecha_reg,

@@ -11,6 +11,6 @@ D:\ECommerce\Actualiza EComerce\LogProcesos\bin\Debug\LogProcesos.dll
 D:\ECommerce\Actualiza EComerce\LogProcesos\bin\Debug\LogProcesos.pdb
 D:\ECommerce\Actualiza EComerce\LogProcesos\bin\Debug\MySql.Data.dll
 D:\ECommerce\Actualiza EComerce\LogProcesos\bin\Debug\MySql.Data.xml
-D:\ECommerce\Actualiza EComerce\LogProcesos\obj\Debug\LogProcesos.csprojResolveAssemblyReference.cache
 D:\ECommerce\Actualiza EComerce\LogProcesos\obj\Debug\LogProcesos.dll
 D:\ECommerce\Actualiza EComerce\LogProcesos\obj\Debug\LogProcesos.pdb
+D:\ECommerce\Actualiza EComerce\LogProcesos\obj\Debug\LogProcesos.csprojResolveAssemblyReference.cache

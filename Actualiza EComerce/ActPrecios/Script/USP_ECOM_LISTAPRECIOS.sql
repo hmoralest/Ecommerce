@@ -20,8 +20,9 @@ AS
 BEGIN
 
 	Select	b.cod_artic							As product_id,
-			Cast(b.val_pvent1 As Decimal(20,6))	As precio1,
-			Cast(b.val_pvent2 As Decimal(20,6))	As precio2,
+	--		Cast((b.val_pvent1/1.18) As Decimal(18,2))	As precio1,
+			Cast(b.val_pvent1 As Varchar) 		As precio1,
+			Cast(b.val_pvent2 As Varchar)		As precio2,
 			b.fec_vigen
 	From thistprecios b
 	Where b.cod_moneda = @moneda

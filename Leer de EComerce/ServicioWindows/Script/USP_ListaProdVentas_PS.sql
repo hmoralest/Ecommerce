@@ -22,6 +22,7 @@ BEGIN
 		BEGIN TRAN act_Venta
 
 		Update Venta Set Ven_EstAct_Alm = '' Where isnull(Ven_EstAct_Alm,'') IN ('E') ;
+		Update Nota_Credito Set Not_EstAct_Alm = '' Where isnull(Not_EstAct_Alm,'') IN ('E') ;
 				
 		COMMIT TRAN act_Venta
 	END TRY
@@ -41,6 +42,7 @@ BEGIN
 	END CATCH
 	
 	SElect 
+		'VT'									As tipo,
 		vta.Ven_Id								As id,
 		det.Ven_Det_ArtId						As producto,
 		Convert(varchar,vta.Ven_Fecha,103)		As fecha
@@ -55,6 +57,27 @@ BEGIN
 			On art.Art_SubCat_Id = scat.Sca_Id
 	Where ltrim(rtrim(vta.Ven_Alm_Id)) = @tienda
 	  And isnull(vta.Ven_EstAct_Alm,'') NOT IN ('P')
-	  And isnull(vta.Ven_Est_Id,'') <> 'FANUL';
+	  And isnull(vta.Ven_Est_Id,'') <> 'FANUL'
+
+	--// Se agregó Sección para Notas de Crédito
+	UNION
+	
+	SElect 
+		'NC'									As tipo,
+		vta.Not_Id								As id,
+		det.Not_Det_ArtId						As producto,
+		Convert(varchar,vta.Not_Fecha,103)		As fecha
+	From Nota_Credito vta
+		Inner Join Nota_Credito_Detalle det
+			On vta.Not_Id = det.Not_Det_Id
+		Inner Join Articulo art
+			On det.Not_Det_ArtId = art.Art_Id And art.Art_Sin_Stk = 0
+		Inner Join Grupo_Talla gru
+			On gru.Gru_Tal_Id = art.Art_Gru_Talla And gru.Gru_Tal_TalId = det.Not_Det_TalId
+		Inner Join SubCategoria scat
+			On art.Art_SubCat_Id = scat.Sca_Id
+	Where ltrim(rtrim(vta.Not_Alm_Id)) = @tienda
+	  And isnull(vta.Not_EstAct_Alm,'') NOT IN ('P')
+	  And isnull(vta.Not_EstId,'') <> '2';
 
 END

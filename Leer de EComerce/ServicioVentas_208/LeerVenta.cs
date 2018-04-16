@@ -43,7 +43,7 @@ namespace ServicioVentas_208
             return result;
         }
 
-        private static void ActualizaVentas(string id_venta, string estado)
+        private static void ActualizaVentas(string id_venta, string estado, string tipo)
         {
 
             using (SqlConnection sql = oConexion.getConexionSQL())
@@ -59,6 +59,7 @@ namespace ServicioVentas_208
 
                     cmd.Parameters.Add("@id", SqlDbType.VarChar).Value = id_venta;
                     cmd.Parameters.Add("@estado", SqlDbType.VarChar).Value = estado;
+                    cmd.Parameters.Add("@tipo", SqlDbType.VarChar).Value = tipo;
 
                     cmd.ExecuteNonQuery();
 
@@ -102,15 +103,15 @@ namespace ServicioVentas_208
         }
 
         private static void InsertarVenta208(   string validavta = "",      string entidad = "",            string tipo_doc = "",           string tipo_doc_sunat = "",
-                                                string serie_doc = "",      string numero_doc = "",         string ven_fecha = "",          string ven_hora = "",
-                                                string pri_nom_cli = "",    string seg_nom_cli = "",        string pri_ape_cli = "",
+                                                string serie_doc = "",      string numero_doc = "",         string ven_fecha = "",          string ven_hora = "",           string cod_ref = "",
+                                                string ser_ref = "",        string num_ref="",              string pri_nom_cli = "",        string seg_nom_cli = "",        string pri_ape_cli = "",
                                                 string seg_ape_cli = "",    string dir_cli = "",            string ruc_cli = "",
                                                 string telf_cli = "",       string usu_crea = "",           string cod_vend = "",           string codigo = "",
                                                 string moneda = "",         string tipo_camb = "",          string doc_pago = "",           string forma_pago = "",         string fec_pago = "", 
                                                 int tot_cant = 0,           decimal tot_precio_sigv = 0,    decimal tot_dcto_sigv = 0,
                                                 decimal total_venta = 0,    decimal tot_igv = 0,            string articulos = "",          string tallas = "",
                                                 string items = "",          string cant_artic = "",         string alm_tien = "",           string seccion = "",
-                                                string prec_artic = "",     string dcto_artic = "")
+                                                string prec_artic = "",     string dcto_artic = "",         string tipo = "")
         {
 
             using (SqlConnection sql = oConexion208.getConexionSQL208())
@@ -119,8 +120,8 @@ namespace ServicioVentas_208
                 {
                     sql.Open();
                     SqlCommand cmd = new SqlCommand();
-                    string valida = validavta+", "+entidad+", "+tipo_doc+", "+tipo_doc_sunat+", "+serie_doc+", "+numero_doc+", "+ven_fecha+", "+ven_hora+", "+
-                                    pri_nom_cli+", "+seg_nom_cli+", "+pri_ape_cli+", "+seg_ape_cli+", "+dir_cli+", "+ruc_cli+", "+telf_cli+", "+usu_crea + ", " +
+                    string valida = validavta + ", " + entidad + ", " + tipo_doc + ", " + tipo_doc_sunat + ", " + serie_doc + ", " + numero_doc + ", " + ven_fecha + ", " + ven_hora + ", " + cod_ref + ", " + ser_ref + ", " + num_ref + ", " +
+                                    pri_nom_cli +", "+seg_nom_cli+", "+pri_ape_cli+", "+seg_ape_cli+", "+dir_cli+", "+ruc_cli+", "+telf_cli+", "+usu_crea + ", " +
                                     cod_vend +", "+codigo+", "+moneda+", "+tipo_camb+", "+doc_pago+", "+forma_pago+", "+fec_pago+", "+tot_cant.ToString() + ", "+tot_precio_sigv.ToString() + ", " +
                                     tot_dcto_sigv.ToString() + ", "+total_venta.ToString() + ", "+tot_igv.ToString() + ", "+articulos+", "+tallas+", "+items+", "+cant_artic+", "+alm_tien+", "+seccion + ", " +
                                     prec_artic +", "+dcto_artic;
@@ -132,12 +133,17 @@ namespace ServicioVentas_208
                     cmd.Parameters.Add("@validavta",    SqlDbType.VarChar).Value =  validavta;
                     cmd.Parameters.Add("@entidad",      SqlDbType.VarChar).Value =  entidad;
 
+                    cmd.Parameters.Add("@tipo",         SqlDbType.VarChar).Value =  tipo;
+
                     cmd.Parameters.Add("@tipo_doc",     SqlDbType.VarChar).Value =  tipo_doc;
                     cmd.Parameters.Add("@tipo_doc_sunat", SqlDbType.VarChar).Value = tipo_doc_sunat;
                     cmd.Parameters.Add("@serie_doc",    SqlDbType.VarChar).Value =  serie_doc;
                     cmd.Parameters.Add("@numero_doc",   SqlDbType.VarChar).Value =  numero_doc;
                     cmd.Parameters.Add("@ven_fecha",    SqlDbType.VarChar).Value =  ven_fecha;
                     cmd.Parameters.Add("@ven_hora",     SqlDbType.VarChar).Value =  ven_hora;
+                    cmd.Parameters.Add("@cod_ref",      SqlDbType.VarChar).Value =  cod_ref;
+                    cmd.Parameters.Add("@ser_ref",      SqlDbType.VarChar).Value =  ser_ref;
+                    cmd.Parameters.Add("@num_ref",      SqlDbType.VarChar).Value =  num_ref;
                     cmd.Parameters.Add("@pri_nom_cli",  SqlDbType.VarChar).Value =  pri_nom_cli;
                     cmd.Parameters.Add("@seg_nom_cli",  SqlDbType.VarChar).Value =  seg_nom_cli;
                     cmd.Parameters.Add("@pri_ape_cli",  SqlDbType.VarChar).Value =  pri_ape_cli;
@@ -184,12 +190,17 @@ namespace ServicioVentas_208
             string validavta = "";
             string entidad = "";
 
+            string tipo = "";
+
             string tipo_doc = "";
             string tipo_doc_sunat = "";
             string serie_doc = "";
             string numero_doc = "";
             string ven_fecha = "";
             string ven_hora = "";
+            string codi_ref = "";
+            string seri_ref = "";
+            string nume_ref = "";
             string pri_nom_cli = "";
             string seg_nom_cli = "";
             string pri_ape_cli = "";
@@ -256,22 +267,26 @@ namespace ServicioVentas_208
                             if(validavta != "")
                             {
                                 // Inserta datos de venta Anterior
-                                InsertarVenta208(validavta, entidad, tipo_doc, tipo_doc_sunat, serie_doc, numero_doc, ven_fecha, ven_hora,
+                                InsertarVenta208(validavta, entidad, tipo_doc, tipo_doc_sunat, serie_doc, numero_doc, ven_fecha, ven_hora, codi_ref, seri_ref, nume_ref,
                                                     pri_nom_cli, seg_nom_cli, pri_ape_cli, seg_ape_cli, dir_cli, ruc_cli, telf_cli, usu_crea,
                                                     cod_vend, codigo, moneda, tipo_camb, doc_pago, forma_pago, fec_pago, tot_cant, tot_precio_sigv,
                                                     tot_dcto_sigv, total_venta, tot_igv, articulos, tallas, items, cant_artic, alm_tien, seccion,
-                                                    prec_artic, dcto_artic);
+                                                    prec_artic, dcto_artic, tipo);
                                 // Se actualiza estado de Venta
-                                ActualizaVentas(validavta.ToString(), "P");
+                                ActualizaVentas(validavta.ToString(), "P", tipo);
                             }
                             // Se Setean datos unicos de venta
                             entidad = venta["entidad"].ToString();
                             tipo_doc = venta["tipo_doc"].ToString();
+                            tipo = venta["tipo"].ToString();
                             tipo_doc_sunat = venta["tipo_doc_sunat"].ToString();
                             serie_doc = venta["serie_doc"].ToString();
                             numero_doc = venta["numero_doc"].ToString();
                             ven_fecha = venta["ven_fecha"].ToString();
                             ven_hora = venta["ven_hora"].ToString();
+                            codi_ref = venta["cod_ref"].ToString();
+                            seri_ref = venta["ser_ref"].ToString();
+                            nume_ref = venta["num_ref"].ToString();
                             pri_nom_cli = venta["pri_nom"].ToString();
                             seg_nom_cli = venta["seg_nom"].ToString();
                             pri_ape_cli = venta["pri_ape"].ToString();
@@ -338,21 +353,24 @@ namespace ServicioVentas_208
 
                     validavta = venta["vta_id"].ToString();
                 }// fin foreach
-                try
+                if (validavta != "")
                 {
-                    // Inserta datos de última Venta
-                    InsertarVenta208(validavta, entidad, tipo_doc, tipo_doc_sunat, serie_doc, numero_doc, ven_fecha, ven_hora,
-                                        pri_nom_cli, seg_nom_cli, pri_ape_cli, seg_ape_cli, dir_cli, ruc_cli, telf_cli, usu_crea,
-                                        cod_vend, codigo, moneda, tipo_camb, doc_pago, forma_pago, fec_pago, tot_cant, tot_precio_sigv,
-                                        tot_dcto_sigv, total_venta, tot_igv, articulos, tallas, items, cant_artic, alm_tien, seccion,
-                                        prec_artic, dcto_artic);
-                    // Se actualiza estado de Venta
-                    ActualizaVentas(validavta.ToString(), "P");
-                }
-                catch (Exception ex)
-                {
-                    ActualizaLogVentas(validavta, "Error en Registro de documento.", ex.Message, proceso_log);
-                    //throw ex;
+                    try
+                    {
+                        // Inserta datos de última Venta
+                        InsertarVenta208(validavta, entidad, tipo_doc, tipo_doc_sunat, serie_doc, numero_doc, ven_fecha, ven_hora, codi_ref, seri_ref, nume_ref,
+                                            pri_nom_cli, seg_nom_cli, pri_ape_cli, seg_ape_cli, dir_cli, ruc_cli, telf_cli, usu_crea,
+                                            cod_vend, codigo, moneda, tipo_camb, doc_pago, forma_pago, fec_pago, tot_cant, tot_precio_sigv,
+                                            tot_dcto_sigv, total_venta, tot_igv, articulos, tallas, items, cant_artic, alm_tien, seccion,
+                                            prec_artic, dcto_artic, tipo);
+                        // Se actualiza estado de Venta
+                        ActualizaVentas(validavta.ToString(), "P", tipo);
+                    }
+                    catch (Exception ex)
+                    {
+                        ActualizaLogVentas(validavta, tipo+" - Error en Registro de documento.", ex.Message, proceso_log);
+                        //throw ex;
+                    }
                 }
                 try
                 {

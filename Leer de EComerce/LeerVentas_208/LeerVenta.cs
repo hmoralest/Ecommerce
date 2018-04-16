@@ -174,6 +174,11 @@ namespace LeerVenta208
                 }
                 catch (Exception Ex)
                 {
+                    string valida = validavta + "', '" + entidad + "', '" + tipo_doc + "', '" + tipo_doc_sunat + "', '" + serie_doc + "', '" + numero_doc + "', '" + ven_fecha + "', '" + ven_hora + "', '" +
+                                    pri_nom_cli + "', '" + seg_nom_cli + "', '" + pri_ape_cli + "', '" + seg_ape_cli + "', '" + dir_cli + "', '" + ruc_cli + "', '" + telf_cli + "', '" + usu_crea + "', '" +
+                                    cod_vend + "', '" + codigo + "', '" + moneda + "', '" + tipo_camb + "', '" + doc_pago + "', '" + forma_pago + "', '" + fec_pago + "', '" + tot_cant.ToString() + "', '" + tot_precio_sigv.ToString() + "', '" +
+                                    tot_dcto_sigv.ToString() + "', '" + total_venta.ToString() + "', '" + tot_igv.ToString() + "', '" + articulos + "', '" + tallas + "', '" + items + "', '" + cant_artic + "', '" + alm_tien + "', '" + seccion + "', '" +
+                                    prec_artic + "', '" + dcto_artic;
                     throw Ex;
                 }
             }
@@ -338,21 +343,24 @@ namespace LeerVenta208
 
                     validavta = venta["vta_id"].ToString();
                 }// fin foreach
-                try
-                {
-                    // Inserta datos de última Venta
-                    InsertarVenta208(validavta, entidad, tipo_doc, tipo_doc_sunat, serie_doc, numero_doc, ven_fecha, ven_hora,
-                                        pri_nom_cli, seg_nom_cli, pri_ape_cli, seg_ape_cli, dir_cli, ruc_cli, telf_cli, usu_crea,
-                                        cod_vend, codigo, moneda, tipo_camb, doc_pago, forma_pago, fec_pago, tot_cant, tot_precio_sigv,
-                                        tot_dcto_sigv, total_venta, tot_igv, articulos, tallas, items, cant_artic, alm_tien, seccion,
-                                        prec_artic, dcto_artic);
-                    // Se actualiza estado de Venta
-                    ActualizaVentas(validavta.ToString(), "P");
-                }
-                catch (Exception ex)
-                {
-                    ActualizaLogVentas(validavta, "Error en Registro de documento.", ex.Message, proceso_log);
-                    //throw ex;
+                if(validavta != "")
+                { 
+                    try
+                    {
+                        // Inserta datos de última Venta
+                        InsertarVenta208(validavta, entidad, tipo_doc, tipo_doc_sunat, serie_doc, numero_doc, ven_fecha, ven_hora,
+                                            pri_nom_cli, seg_nom_cli, pri_ape_cli, seg_ape_cli, dir_cli, ruc_cli, telf_cli, usu_crea,
+                                            cod_vend, codigo, moneda, tipo_camb, doc_pago, forma_pago, fec_pago, tot_cant, tot_precio_sigv,
+                                            tot_dcto_sigv, total_venta, tot_igv, articulos, tallas, items, cant_artic, alm_tien, seccion,
+                                            prec_artic, dcto_artic);
+                        // Se actualiza estado de Venta
+                        ActualizaVentas(validavta.ToString(), "P");
+                    }
+                    catch (Exception ex)
+                    {
+                        ActualizaLogVentas(validavta, "Error en Registro de documento.", ex.Message, proceso_log);
+                        //throw ex;
+                    }
                 }
                 try
                 {

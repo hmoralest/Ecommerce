@@ -20,7 +20,7 @@ BEGIN
 	Select	codart											As product_id,
 			Replace(convert(varchar,fecini,102),'.','')		As Fecha_Ini,
 			Replace(convert(varchar,fecfin,102),'.','')		As Fecha_Fin,
-			montodcto										As Monto
+			Cast(montodcto As Varchar)						As Monto
 	From Scaprom
 	Where codtda = @tienda
 	  And estado NOT IN ('D')

@@ -27,8 +27,11 @@ namespace ActPrecios
         string archivo = "";
         string moneda = "PEN";
         string seccion = "5";
-        string tienda = "e-com";
+        string tienda = "50005";
         public static StreamWriter sw;
+
+        private static bool escribe_archivo = true;
+        private static bool escribe_log = true;
 
         public DataTable ListaPrecios(string moneda, string seccion, string tienda)
         {
@@ -71,11 +74,20 @@ namespace ActPrecios
 
         public void ActualizaPrecios(DataTable precios)
         {
-            if (log.ValidaProceso(proceso) != 1)
+            int valida = 0;
+            if (escribe_log)
+            {
+                log.ValidaProceso(proceso);
+            }
+            if (valida != 1)
             {
                 int estado = 1;
+                //Actualiza estado a proceso abierto
+                if (escribe_log)
+                {
+                    log.ActualizaLogProceso(proceso, -1);
+                }
                 //datos generales
-                log.ActualizaLogProceso(proceso, -1);
                 mysql = oConexionMySql.getConexionMySQL();
                 mysql.Open();
 
@@ -108,11 +120,14 @@ namespace ActPrecios
                 }
                 catch (Exception ex)
                 {
-                    sw.WriteLine(ex.Message);
                     estado = 0;
-                    log.ActualizaLogProceso(proceso, estado);
-                    sw.WriteLine("Error en lectura de productos en Prestashop.");
-                    sw.WriteLine("************ Fin Proceso:  " + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + "");
+                    if (escribe_log) { log.ActualizaLogProceso(proceso, estado); }
+                    if (escribe_archivo)
+                    {
+                        sw.WriteLine(ex.Message);
+                        sw.WriteLine("Error en lectura de productos en Prestashop.");
+                        sw.WriteLine("************ Fin Proceso:  " + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + "");
+                    }
                     return;
                 }
 
@@ -166,11 +181,12 @@ namespace ActPrecios
                 {
                     cant_reg = cant_reg + 1;
                     //Actualizar en Prestashop
-                    double precio = Math.Round((Convert.ToDouble(row["precio1"]) / 1.18), 1);
+                    //double precio = Math.Round((Convert.ToDouble(row["precio1"]) / 1.18), 1);
+                    //double precio = Convert.ToDouble(row["precio1"]);
                     MySqlCommand comm = mysql.CreateCommand();
                     MySqlCommand com2 = mysql.CreateCommand();
-                    comm.CommandText = "Update ps_product p set p.price = " + precio.ToString() + " where replace(p.reference,'-','') = '" + row["product_id"] + "';";
-                    com2.CommandText = "Update ps_product_shop ps Inner Join ps_product p On ps.id_product = p.id_product Set ps.price = " + precio.ToString() + " Where replace(p.reference, '-', '') = '" + row["product_id"] + "'; ";
+                    comm.CommandText = "Update ps_product p set p.price = " + row["precio1"].ToString() + " where replace(p.reference,'-','') = '" + row["product_id"] + "';";
+                    com2.CommandText = "Update ps_product_shop ps Inner Join ps_product p On ps.id_product = p.id_product Set ps.price = " + row["precio1"].ToString() + " Where replace(p.reference, '-', '') = '" + row["product_id"] + "'; ";
 
                     try
                     {
@@ -180,15 +196,18 @@ namespace ActPrecios
                     }
                     catch(Exception ex)
                     {
-                        sw.WriteLine(ex.Message);
                         estado = 0;
-                        log.ActualizaLogProceso(proceso, estado);
-                        sw.WriteLine("Error en actualizar precio de producto " + row["product_id"] + " y descuento " + row["Monto"] + " en Prestashop.");
+                        if (escribe_log) { log.ActualizaLogProceso(proceso, estado); }
+                        if (escribe_archivo)
+                        {
+                            sw.WriteLine(ex.Message);
+                            sw.WriteLine("Error en actualizar precio de producto " + row["product_id"] + " y precio " + row["precio1"] + " en Prestashop.");
+                        }
                     }
                 }
 
                 string termino_proceso;
-                log.ActualizaLogProceso(proceso, estado);
+                if (escribe_log) { log.ActualizaLogProceso(proceso, estado); }
                 if (estado == 1)
                 {
                     termino_proceso = "correctamente.";
@@ -197,27 +216,56 @@ namespace ActPrecios
                 {
                     termino_proceso = "con errores.";
                 }
-                sw.WriteLine("Se actualizaron " + cant_reg.ToString() + " registros.");
-                sw.WriteLine("El proceso terminó " + termino_proceso);
+                if (escribe_archivo)
+                {
+                    sw.WriteLine("Se actualizaron " + cant_reg.ToString() + " registros.");
+                    sw.WriteLine("El proceso terminó " + termino_proceso);
+                }
             }
             else
             {
-                sw.WriteLine("El proceso se aborto por el flag de control.");
+                if (escribe_archivo)
+                {
+                    sw.WriteLine("El proceso se aborto por el flag de control.");
+                }
             }
-            sw.WriteLine("************ Fin Proceso:  " + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + "");
+            if (escribe_archivo)
+            {
+                sw.WriteLine("************ Fin Proceso:  " + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + "");
+            }
         }
 
         public static void Main(string[] args)
         {
             ActPrecio exe = new ActPrecio();
 
-            exe.CrearArchivoLog();
-            sw.WriteLine("************ Inicio Proceso:  " + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + "");
+            // Creación de Archivo
+            try
+            {
+                exe.CrearArchivoLog();
+                sw.WriteLine("************ Inicio Proceso:  " + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + "");
+            }
+            catch
+            {
+                escribe_archivo = false;
+            }
 
+            // Creación de Log SQL
             try
             {
                 exe.log.CreaLogProceso(exe.proceso);
-                
+            }
+            catch (Exception ex)
+            {
+                escribe_log = false;
+                if (escribe_archivo)
+                {
+                    sw.WriteLine("Error en Creación de Flag de Procesos en SQL.");
+                    sw.WriteLine(ex.Message);
+                }
+            }
+            try
+            {
                 DataTable tabla = new DataTable();
 
                 tabla = exe.ListaPrecios(exe.moneda, exe.seccion, exe.tienda);
@@ -227,9 +275,12 @@ namespace ActPrecios
             }
             catch (Exception ex)
             {
-                exe.log.ActualizaLogProceso(exe.proceso, -1);
-                sw.WriteLine(ex.Message);
-                sw.Close();
+                if (escribe_log) { exe.log.ActualizaLogProceso(exe.proceso, -1); }
+                if (escribe_archivo)
+                {
+                    sw.WriteLine(ex.Message);
+                    sw.Close();
+                }
             }
 
         }
