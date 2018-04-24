@@ -20,22 +20,69 @@ namespace ServicioWindows
         //static string path = "D:\\Actualizar Stock Almacen con Ventas\\Tablas\\";
         static string path = ConfigurationManager.ConnectionStrings["dbf"].ConnectionString;
 
-        static string tienda = "11"; //SQL
+        static string tienda = ""; //SQL
         public static string proceso_log = "ActStock_DBF";
 
-        static string calidad = "1"; //DBF (producto) OK
-        static string almacen = "I"; //DBF (stock producto) OK
-        static string concepto_vt = "98"; //DBF (movimiento_venta) OK
-        static string concepto_nc = "98"; //DBF (movimiento_notacred) OK
-        static string client = "00000"; //DBF (movimiento - cliente generico)
-        static string empresa = "02"; //DBF (stock producto) ok
-        static string canal = "5"; //DBF (stock producto) OK
-        static string cadena = "BA"; //DBF (stock producto) OK
-        static string pack = "00001"; //DBF (stock producto) OK
-        static string cant_pack = "0"; //DBF (movimiento) OK
+        static string calidad = ""; //DBF (producto) OK
+        static string almacen = ""; //DBF (stock producto) OK
+        static string concepto_vt = ""; //DBF (movimiento_venta) OK
+        static string concepto_nc = ""; //DBF (movimiento_notacred) 
+        static string client = ""; //DBF (movimiento - cliente generico)
+        static string empresa = ""; //DBF (stock producto) ok
+        static string canal = ""; //DBF (stock producto) OK
+        static string cadena = ""; //DBF (stock producto) OK
+        static string pack = ""; //DBF (stock producto) OK
+        static string cant_pack = ""; //DBF (movimiento) OK
 
         static DateTime Hoy = DateTime.Now;
 
+        /// <summary>
+        /// Metodo que efectúa el llenado de todas las variables globales
+        /// </summary>
+        private static void Llenar_datos()
+        {
+            tienda = Obten_DatoGeneral("cod_alma"); 
+            calidad = Obten_DatoGeneral("prod_calid");
+            almacen = Obten_DatoGeneral("alma_stk");
+            concepto_vt = Obten_DatoGeneral("conc_venta");
+            concepto_nc = Obten_DatoGeneral("conc_ncred");
+            client = Obten_DatoGeneral("cod_client");
+            empresa = Obten_DatoGeneral("cod_empre");
+            canal = Obten_DatoGeneral("cod_canal");
+            cadena = Obten_DatoGeneral("cod_cadena");
+            pack = Obten_DatoGeneral("cod_pack");
+            cant_pack = Obten_DatoGeneral("cant_pack");
+        }
+        /// <summary>
+        /// metodo que obtiene los datos Genéricos usados
+        /// </summary>
+        /// <param name="codigo">codigo que referencia los datos genéricos almacenados en SQL</param>
+        /// <returns>dato obtenido desde la BD E_COMMERCE</returns>
+        public static string Obten_DatoGeneral(string codigo)
+        {
+            string rtpa = "";
+            DataTable dt = new DataTable();
+            using (SqlConnection sql = oConexion.getConexionSQL())
+            {
+                try
+                {
+                    string query = "SELECT dbo.UFN_Obtiene_DatosGenerales('" + codigo + "') As dato;";
+
+                    SqlCommand cmd = new SqlCommand(query, sql);
+                    SqlDataAdapter da = new SqlDataAdapter(cmd);
+
+                    da.Fill(dt);
+
+                    rtpa = dt.Rows[0]["dato"].ToString();
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+
+            return rtpa;
+        }
         private static DataTable ListaVentas()
         {
             DataTable result = new DataTable();
@@ -236,6 +283,9 @@ namespace ServicioWindows
 
         public static void ActualizaenDBF()
         {
+            //LLena Datos Generales
+            Llenar_datos();
+
             //string sConn = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + System.IO.Path.GetDirectoryName(path) + ";Extended Properties=dBASE IV;";
             string sConn = "Provider = vfpoledb.1;Data Source=" + System.IO.Path.GetDirectoryName(path) + ";Collating Sequence=general";
             string producto = "";

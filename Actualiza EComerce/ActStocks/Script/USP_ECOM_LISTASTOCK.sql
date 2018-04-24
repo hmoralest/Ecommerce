@@ -3,9 +3,13 @@ If Exists(Select * from sysobjects Where name = 'USP_ECOM_LISTASTOCK' And type =
 GO
 
 -- =====================================================================
--- Author		: Henry Morales
--- Create date	: 12-02-2018
--- Description	: Lista Movimientos de Stock para enviarlos a PrestaShop
+-- Author			: Henry Morales
+-- Create date		: 12-02-2018
+-- Description		: Lista Movimientos de Stock para enviarlos a PrestaShop
+-- =====================================================================
+-- Modificado por	: Henry Morales
+-- Create date		: 18-04-2018
+-- Description		: Se realiza actualización y control por Detalle
 -- =====================================================================
 /*
 	Exec USP_ECOM_LISTASTOCK '11'
@@ -34,7 +38,8 @@ BEGIN
 			On mov.Mov_Id = det.Mov_Det_Id
 	Where mov.Mov_AlmId = @tienda
 	  And mov.Mov_EstId = 'A'
-	  And isnull(mov.Mov_EstPS,'') <> 'P'
+	  --And isnull(mov.Mov_EstPS,'') <> 'P'
+	  And isnull(det.Mov_Det_EstId,'') <> 'P'
 	  And Mov_ConId IN ('30','31');
 
 END

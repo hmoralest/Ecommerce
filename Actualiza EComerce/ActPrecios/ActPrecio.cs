@@ -25,9 +25,9 @@ namespace ActPrecios
 
         string proceso = "ActPrecios";
         string archivo = "";
-        string moneda = "PEN";
-        string seccion = "5";
-        string tienda = "50005";
+        string moneda = "";
+        string seccion = "";
+        string tienda = "";
         public static StreamWriter sw;
 
         private static bool escribe_archivo = true;
@@ -55,6 +55,45 @@ namespace ActPrecios
             return dt;
         }
 
+        /// <summary>
+        /// Metodo que efectúa el llenado de todas las variables globales
+        /// </summary>
+        private void Llenar_datos()
+        {
+            moneda = Obten_DatoGeneral("cod_moneda");
+            seccion = Obten_DatoGeneral("cod_secci");
+            tienda = Obten_DatoGeneral("pref_tda") + "" + Obten_DatoGeneral("cod_tienda");
+        }
+        /// <summary>
+        /// metodo que obtiene los datos Genéricos usados
+        /// </summary>
+        /// <param name="codigo">codigo que referencia los datos genéricos almacenados en SQL</param>
+        /// <returns>dato obtenido desde la BD E_COMMERCE</returns>
+        public string Obten_DatoGeneral(string codigo)
+        {
+            string rtpa = "";
+            DataTable dt = new DataTable();
+            using (sql = oConexion.getConexionSQL())
+            {
+                try
+                {
+                    string query = "SELECT dbo.UFN_Obtiene_DatosGenerales('" + codigo + "') As dato;";
+
+                    SqlCommand cmd = new SqlCommand(query, sql);
+                    SqlDataAdapter da = new SqlDataAdapter(cmd);
+
+                    da.Fill(dt);
+
+                    rtpa = dt.Rows[0]["dato"].ToString();
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+
+            return rtpa;
+        }
         public void CrearArchivoLog()
         {
             //datos para archivo LOG
@@ -261,6 +300,20 @@ namespace ActPrecios
                 if (escribe_archivo)
                 {
                     sw.WriteLine("Error en Creación de Flag de Procesos en SQL.");
+                    sw.WriteLine(ex.Message);
+                }
+            }
+            // Obtener Datos desde SQL
+            try
+            {
+                exe.Llenar_datos();
+            }
+            catch (Exception ex)
+            {
+                escribe_log = false;
+                if (escribe_archivo)
+                {
+                    sw.WriteLine("Error en Obtener Datos Generales en SQL.");
                     sw.WriteLine(ex.Message);
                 }
             }

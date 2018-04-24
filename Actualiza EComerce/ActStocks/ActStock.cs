@@ -20,8 +20,51 @@ namespace ActStocks
         MySqlConnection mysql;
         Conexion oConexionMySql = new Conexion();
 
-        string tienda = "11";
+        string tienda = "";
         string error = "";
+        int cant_reg = 0;
+
+        public static StreamWriter sw;
+        string archivo = "";
+        private static bool escribe_archivo = true;
+
+        /// <summary>
+        /// Metodo que efectúa el llenado de todas las variables globales
+        /// </summary>
+        private void Llenar_datos()
+        {
+            tienda = Obten_DatoGeneral("cod_alma");
+        }
+        /// <summary>
+        /// metodo que obtiene los datos Genéricos usados
+        /// </summary>
+        /// <param name="codigo">codigo que referencia los datos genéricos almacenados en SQL</param>
+        /// <returns>dato obtenido desde la BD E_COMMERCE</returns>
+        public string Obten_DatoGeneral(string codigo)
+        {
+            string rtpa = "";
+            DataTable dt = new DataTable();
+            using (sql = oConexion.getConexionSQL())
+            {
+                try
+                {
+                    string query = "SELECT dbo.UFN_Obtiene_DatosGenerales('" + codigo + "') As dato;";
+
+                    SqlCommand cmd = new SqlCommand(query, sql);
+                    SqlDataAdapter da = new SqlDataAdapter(cmd);
+
+                    da.Fill(dt);
+
+                    rtpa = dt.Rows[0]["dato"].ToString();
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+
+            return rtpa;
+        }
 
         public DataTable ListaStocks(string tienda)
         {
@@ -41,7 +84,7 @@ namespace ActStocks
             return dt;
         }
 
-        public void ActualizaOrigen(string tienda, string mov_id)
+        public void ActualizaOrigen(string tienda, string mov_id, string detmov_id)
         {
             SqlCommand cmd = new SqlCommand();
             cmd.CommandText = "USP_ECOM_ACTSTOCK";
@@ -50,6 +93,7 @@ namespace ActStocks
 
             cmd.Parameters.Add("@tienda", SqlDbType.VarChar).Value = tienda;
             cmd.Parameters.Add("@mov_id", SqlDbType.VarChar).Value = mov_id;
+            cmd.Parameters.Add("@det_mov_id", SqlDbType.VarChar).Value = detmov_id;
 
             try
             {
@@ -99,6 +143,25 @@ namespace ActStocks
             }
         }
 
+        /// <summary>
+        /// Método para crear archivo que se usará como log
+        /// </summary>
+        public void CrearArchivoLog()
+        {
+            //datos para archivo LOG
+            string path = Environment.CurrentDirectory;
+            string nombre = "Log Errores";
+            string nom_archiv = DateTime.Today.ToString("yyyy.MM.dd") + " Log Actualiza Stock";
+            //crea directorio si no existe
+            if (!Directory.Exists(path + "\\" + nombre))
+            {   //Crea el directorio
+                DirectoryInfo di = Directory.CreateDirectory(path + "\\" + nombre);
+            }
+            //Crea el Writer
+            sw = File.AppendText(path + "\\" + nombre + "\\" + nom_archiv + ".txt");
+            archivo = path + "\\" + nombre + "\\" + nom_archiv + ".txt";
+        }
+
         public void ActualizaStocks(DataTable precios)
         {
             //Valida con Productos Existentes
@@ -138,8 +201,12 @@ namespace ActStocks
                 }
                 if (val == "no")
                 {
-                    error = "No se encontró producto " + row1["product_id"] + " en Prestashop";
-                    throw new System.ArgumentException("Código de Producto Inválido", "reference");
+                    error = "No se encontró producto " + row1["product_id"] + " en Prestashop.";
+                    if (escribe_archivo)
+                    {
+                        sw.WriteLine(error);
+                    }
+                    //throw new System.ArgumentException("Código de Producto Inválido", "reference");
                 }
             }
 
@@ -156,27 +223,11 @@ namespace ActStocks
                 throw ex;
             }
 
-            int cant_reg = 0;
             string id_mov = "";
             //recorro datatable final
             foreach (DataRow row in Final.Rows)
             {
-                //Actualizar Movimiento para no repetir
-                if (id_mov == row["mov_id"].ToString() && id_mov != "")
-                {
-                    try
-                    {
-                        ActualizaOrigen(tienda, id_mov);
-                    }
-                    catch (Exception ex)
-                    {
-                        error = "No se pudo actualizar estado de Movimiento " + id_mov + ".";
-                        throw ex;
-                    }
-                }
-
                 id_mov = row["mov_id"].ToString();
-                cant_reg = cant_reg + 1;
                 //Actualizar en Prestashop
                 MySqlCommand comm = mysql.CreateCommand();
                 comm.CommandText = "Insert into ps_erp (ref_product, stock) values ('" + row["product_id"] + "'," + row["cantidad"] + ");";
@@ -185,28 +236,33 @@ namespace ActStocks
                 {
                     //ejecucion
                     comm.ExecuteNonQuery();
+                    //Actualiza estado para no repetir
+                    ActualizaOrigen(tienda, row["mov_id"].ToString(), row["det_mov_id"].ToString());
                 }
                 catch (Exception ex)
                 {
                     error = "No se pudo insertar datos en la tabla ps_erp.";
                     throw ex;
                 }
+                cant_reg = cant_reg + 1;
             }
-
-            try
-            {
-                //Actualizar Movimiento para no repetir
-                ActualizaOrigen(tienda, id_mov);
-            }
-            catch (Exception ex)
-            {
-                error = "No se pudo actualizar estado de Movimiento " + id_mov + ".";
-                throw ex;
-            }
+            
         }
 
         public string EjecutaStock()
         {
+            // Se debe comentar para integrar
+            // Creación de Archivo
+            try
+            {
+                CrearArchivoLog();
+                sw.WriteLine("************ Inicio Proceso:  " + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + "");
+            }
+            catch
+            {
+                escribe_archivo = false;
+            }
+
             try
             {
                 sql = oConexion.getConexionSQL();
@@ -219,7 +275,28 @@ namespace ActStocks
             }
             catch(Exception ex)
             {
+                if (escribe_archivo)
+                {
+                    sw.WriteLine("No se pudo abrir Transaccion. // " + ex.Message);
+                    sw.Close();
+                }
                 return "No se pudo abrir Transaccion. // " + ex.Message;
+            }
+
+            // Obtener Datos desde SQL
+            try
+            {
+                Llenar_datos();
+            }
+            catch (Exception ex)
+            {
+                if (escribe_archivo)
+                {
+                    sw.WriteLine("Error en Obtener Datos Generales en SQL.// " + ex.Message);
+                    sw.WriteLine(ex.Message);
+                    sw.Close();
+                }
+                return "Error en Obtener Datos Generales en SQL. // " + ex.Message;
             }
 
             try
@@ -235,11 +312,24 @@ namespace ActStocks
                 ControlaTrans(2);
                 sql.Close();
                 mysql.Close();
+                if (escribe_archivo)
+                {
+                    sw.WriteLine("Error: " + error + " // " + ex.Message);
+                    sw.WriteLine("Se actualizaron " + cant_reg.ToString() + " registros.");
+                    sw.WriteLine("************ Fin Proceso:  " + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + "");
+                    sw.Close();
+                }
                 return "Error: " + error + " // " + ex.Message;
             }
             ControlaTrans(1);
             sql.Close();
             mysql.Close();
+            if (escribe_archivo)
+            {
+                sw.WriteLine("Se actualizaron " + cant_reg.ToString() + " registros.");
+                sw.WriteLine("************ Fin Proceso:  " + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + "");
+                sw.Close();
+            }
             return "";
         }
 
